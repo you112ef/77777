@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sperm Analyzer AI</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #60a5fa, #93c5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #93c5fd;
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.online {
+            background: #10b981;
+        }
+        
+        .status-dot.offline {
+            background: #ef4444;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            color: #333;
+            height: 250px;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            width: auto;
+        }
+        
+        .upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area:hover {
+            border-color: #60a5fa;
+            background: rgba(96, 165, 250, 0.1);
+        }
+        
+        .upload-area.dragover {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .analysis-results {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+        }
+        
+        .metric:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-value {
+            font-weight: bold;
+            color: #60a5fa;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .feature {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .feature-icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+        
+        .feature h4 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+        
+        .feature p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .chart-container {
+                height: 200px;
+            }
+            
+            .upload-area {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧬 Sperm Analyzer AI</h1>
+            <p>Advanced AI-powered sperm analysis with real-time CASA metrics</p>
+        </div>
+        
+        <div class="grid">
+            <!-- Backend Status -->
+            <div class="card">
+                <h3>🖥️ Backend Status</h3>
+                <div class="status">
+                    <div class="status-dot" id="backendStatus"></div>
+                    <span id="backendText">Checking...</span>
+                </div>
+                <p>FastAPI server providing AI analysis endpoints</p>
+                <button class="btn btn-small" onclick="checkBackend()">🔄 Refresh</button>
+            </div>
+            
+            <!-- Analysis Upload -->
+            <div class="card">
+                <h3>📤 Upload Analysis</h3>
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <div class="feature-icon">📁</div>
+                    <p>Click to upload video or image</p>
+                    <p><small>Supports .mp4, .avi, .jpg, .png</small></p>
+                </div>
+                <input type="file" id="fileInput" accept=".mp4,.avi,.jpg,.jpeg,.png" onchange="uploadFile(this.files[0])">
+                <div id="uploadProgress" style="display: none;">
+                    <div style="background: rgba(255, 255, 255, 0.2); border-radius: 5px; overflow: hidden; margin-top: 10px;">
+                        <div id="progressBar" style="background: #10b981; height: 8px; width: 0%; transition: width 0.3s ease;"></div>
+                    </div>
+                    <p id="progressText" style="margin-top: 5px; font-size: 0.9rem;">Uploading...</p>
+                </div>
+            </div>
+            
+            <!-- Recent Analyses -->
+            <div class="card">
+                <h3>📊 Recent Analyses</h3>
+                <div id="analysesContainer">
+                    <p>No analyses yet. Upload a file to start!</p>
+                </div>
+                <button class="btn btn-small" onclick="loadAnalyses()">🔄 Refresh</button>
+            </div>
+        </div>
+        
+        <!-- Chart Display -->
+        <div class="card">
+            <h3>📈 Analysis Visualization</h3>
+            <div class="chart-container">
+                <canvas id="motilityChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="velocityChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Analysis Results -->
+        <div class="analysis-results" id="analysisResults">
+            <h3>🔬 Latest Analysis Results</h3>
+            <div id="resultsContent"></div>
+        </div>
+        
+        <!-- Features -->
+        <div class="feature-grid">
+            <div class="feature">
+                <div class="feature-icon">🤖</div>
+                <h4>YOLOv8 Detection</h4>
+                <p>AI-powered sperm detection</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <h4>CASA Metrics</h4>
+                <p>WHO-compliant analysis</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📱</div>
+                <h4>Mobile Ready</h4>
+                <p>Optimized for mobile devices</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🌍</div>
+                <h4>Multi-language</h4>
+                <p>English and Arabic support</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8001/api/v1';
+        let currentAnalysisId = null;
+        
+        // Check backend status
+        async function checkBackend() {
+            try {
+                const response = await fetch(`${API_BASE}/status`);
+                const data = await response.json();
+                
+                document.getElementById('backendStatus').className = 'status-dot online';
+                document.getElementById('backendText').textContent = `Online - ${data.version}`;
+                
+            } catch (error) {
+                document.getElementById('backendStatus').className = 'status-dot offline';
+                document.getElementById('backendText').textContent = 'Offline';
+            }
+        }
+        
+        // Upload file for analysis
+        async function uploadFile(file) {
+            if (!file) return;
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const uploadProgress = document.getElementById('uploadProgress');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            uploadProgress.style.display = 'block';
+            progressText.textContent = 'Uploading and starting analysis...';
+            progressBar.style.width = '10%';
+            
+            try {
+                const response = await fetch(`${API_BASE}/analyze`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                currentAnalysisId = data.analysis_id;
+                
+                progressBar.style.width = '30%';
+                progressText.textContent = 'Analysis started, monitoring progress...';
+                
+                // Monitor analysis progress
+                monitorAnalysis(data.analysis_id);
+                
+            } catch (error) {
+                progressText.textContent = 'Upload failed: ' + error.message;
+                progressBar.style.width = '0%';
+                console.error('Upload error:', error);
+            }
+        }
+        
+        // Monitor analysis progress
+        async function monitorAnalysis(analysisId) {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            const checkProgress = async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/analysis/${analysisId}/status`);
+                    const status = await response.json();
+                    
+                    progressBar.style.width = status.progress + '%';
+                    progressText.textContent = status.message;
+                    
+                    if (status.status === 'completed') {
+                        progressText.textContent = 'Analysis completed! Loading results...';
+                        await loadAnalysisResults(analysisId);
+                        document.getElementById('uploadProgress').style.display = 'none';
+                        loadAnalyses();
+                    } else if (status.status === 'failed') {
+                        progressText.textContent = 'Analysis failed';
+                        document.getElementById('uploadProgress').style.display = 'none';
+                    } else {
+                        setTimeout(checkProgress, 1000);
+                    }
+                } catch (error) {
+                    progressText.textContent = 'Error checking progress';
+                    console.error('Progress check error:', error);
+                }
+            };
+            
+            checkProgress();
+        }
+        
+        // Load analysis results
+        async function loadAnalysisResults(analysisId) {
+            try {
+                const response = await fetch(`${API_BASE}/analysis/${analysisId}/results`);
+                const data = await response.json();
+                
+                const resultsDiv = document.getElementById('analysisResults');
+                const resultsContent = document.getElementById('resultsContent');
+                
+                resultsContent.innerHTML = `
+                    <div class="metric">
+                        <span>Filename</span>
+                        <span class="metric-value">${data.filename}</span>
+                    </div>
+                    <div class="metric">
+                        <span>Total Count</span>
+                        <span class="metric-value">${data.casa_metrics.total_count}</span>
+                    </div>
+                    <div class="metric">
+                        <span>Progressive Motility</span>
+                        <span class="metric-value">${data.casa_metrics.progressive_motility.toFixed(1)}%</span>
+                    </div>
+                    <div class="metric">
+                        <span>VCL Mean</span>
+                        <span class="metric-value">${data.casa_metrics.vcl_mean.toFixed(1)} μm/s</span>
+                    </div>
+                    <div class="metric">
+                        <span>VSL Mean</span>
+                        <span class="metric-value">${data.casa_metrics.vsl_mean.toFixed(1)} μm/s</span>
+                    </div>
+                    <div class="metric">
+                        <span>Processing Time</span>
+                        <span class="metric-value">${data.processing_time.toFixed(1)}s</span>
+                    </div>
+                `;
+                
+                resultsDiv.style.display = 'block';
+                updateCharts(data.casa_metrics);
+                
+            } catch (error) {
+                console.error('Error loading results:', error);
+            }
+        }
+        
+        // Load analyses list
+        async function loadAnalyses() {
+            try {
+                const response = await fetch(`${API_BASE}/analysis/list`);
+                const data = await response.json();
+                
+                const container = document.getElementById('analysesContainer');
+                
+                if (data.analyses.length === 0) {
+                    container.innerHTML = '<p>No analyses yet. Upload a file to start!</p>';
+                    return;
+                }
+                
+                container.innerHTML = data.analyses.slice(0, 3).map(analysis => `
+                    <div class="metric" style="cursor: pointer;" onclick="loadAnalysisResults('${analysis.analysis_id}')">
+                        <span>${analysis.filename}</span>
+                        <span class="metric-value">${new Date(analysis.created_at).toLocaleDateString()}</span>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading analyses:', error);
+            }
+        }
+        
+        // Update charts
+        function updateCharts(metrics) {
+            // Clear existing charts
+            const motilityCanvas = document.getElementById('motilityChart');
+            const velocityCanvas = document.getElementById('velocityChart');
+            
+            // Destroy existing chart instances if they exist
+            if (window.motilityChart) window.motilityChart.destroy();
+            if (window.velocityChart) window.velocityChart.destroy();
+            
+            // Motility Chart
+            const motilityCtx = motilityCanvas.getContext('2d');
+            window.motilityChart = new Chart(motilityCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Progressive', 'Non-Progressive', 'Immotile'],
+                    datasets: [{
+                        data: [
+                            metrics.progressive_motility,
+                            metrics.non_progressive_motility,
+                            metrics.immotile
+                        ],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Motility Distribution'
+                        }
+                    }
+                }
+            });
+            
+            // Velocity Chart
+            const velocityCtx = velocityCanvas.getContext('2d');
+            window.velocityChart = new Chart(velocityCtx, {
+                type: 'line',
+                data: {
+                    labels: ['0s', '1s', '2s', '3s', '4s', '5s'],
+                    datasets: [
+                        {
+                            label: 'VCL (μm/s)',
+                            data: Array(6).fill(metrics.vcl_mean),
+                            borderColor: '#3b82f6',
+                            fill: false
+                        },
+                        {
+                            label: 'VSL (μm/s)',
+                            data: Array(6).fill(metrics.vsl_mean),
+                            borderColor: '#ef4444',
+                            fill: false
+                        },
+                        {
+                            label: 'VAP (μm/s)',
+                            data: Array(6).fill(metrics.vap_mean),
+                            borderColor: '#10b981',
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Velocity Parameters'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Drag and drop functionality
+        const uploadArea = document.querySelector('.upload-area');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                uploadFile(files[0]);
+            }
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkBackend();
+            loadAnalyses();
+        });
+        
+        // Auto-refresh status every 30 seconds
+        setInterval(checkBackend, 30000);
+    </script>
+</body>
+</html>
