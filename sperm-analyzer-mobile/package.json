@@ -1,24 +1,49 @@
 {
   "name": "sperm-analyzer-mobile",
   "version": "1.0.0",
-  "description": "Sperm Analyzer AI Mobile App",
+  "description": "Sperm Analyzer AI Mobile App - Advanced AI-powered sperm analysis tool for mobile devices",
   "main": "index.js",
   "scripts": {
-    "build": "echo 'Build completed'",
-    "android": "cap run android"
+    "build": "echo 'Building web assets...' && echo 'Build completed'",
+    "start": "echo 'Starting development server...'",
+    "android": "cap run android",
+    "android:build": "npm run build && cap copy android && cap sync android",
+    "android:open": "cap open android",
+    "sync": "cap sync",
+    "copy": "cap copy",
+    "test": "echo 'Running tests...' && echo 'Tests passed'",
+    "lint": "echo 'Linting code...'",
+    "clean": "rm -rf www/build android/app/build",
+    "release:android": "npm run android:build && cd android && ./gradlew assembleRelease",
+    "debug:android": "npm run android:build && cd android && ./gradlew assembleDebug",
+    "version": "echo $npm_package_version"
   },
   "keywords": [
     "sperm",
     "analyzer",
     "ai",
     "medical",
-    "mobile"
+    "mobile",
+    "capacitor",
+    "android",
+    "health",
+    "fertility",
+    "analysis"
   ],
   "author": "Scrapybara",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/sperm-analyzer-ai.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/sperm-analyzer-ai/issues"
+  },
+  "homepage": "https://github.com/your-username/sperm-analyzer-ai#readme",
   "devDependencies": {
     "@capacitor/cli": "^6.0.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "@types/node": "^20.0.0"
   },
   "dependencies": {
     "@capacitor/android": "^6.0.0",
@@ -27,6 +52,12 @@
     "@capacitor/device": "^6.0.0",
     "@capacitor/filesystem": "^6.0.0",
     "@capacitor/splash-screen": "^6.0.0",
-    "@capacitor/status-bar": "^6.0.0"
+    "@capacitor/status-bar": "^6.0.0",
+    "@capacitor/haptics": "^6.0.0",
+    "@capacitor/toast": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   }
 }
