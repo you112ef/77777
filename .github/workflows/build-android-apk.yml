@@ -90,10 +90,37 @@ jobs:
           pip install numpy tensorflow opencv-python ultralytics matplotlib scikit-learn pandas tqdm requests fastapi uvicorn
 
       - name: 📦 Install Mobile Dependencies
-        working-directory: sperm-analyzer-mobile
+        working-directory: ./sperm-analyzer-mobile
         run: |
-          npm ci
+          echo "📦 Installing mobile app dependencies..."
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          
+          # Create .npmrc if it doesn't exist
+          if [ ! -f .npmrc ]; then
+            echo "legacy-peer-deps=true" > .npmrc
+            echo "auto-install-peers=true" >> .npmrc
+            echo "fund=false" >> .npmrc
+            echo "audit=false" >> .npmrc
+          fi
+          
+          # Try npm ci first, fallback to npm install if it fails
+          if ! npm ci; then
+            echo "⚠️ npm ci failed, falling back to npm install..."
+            rm -f package-lock.json
+            npm install
+            echo "✅ npm install completed, now running npm ci..."
+            npm ci
+          fi
+          
+          echo "✅ Mobile dependencies installed successfully"
+
+      - name: 🏗️ Build Mobile App
+        working-directory: ./sperm-analyzer-mobile
+        run: |
+          echo "🏗️ Building mobile app..."
           npm run build
+          echo "✅ Mobile app built successfully"
 
       - name: 🔧 Setup Capacitor
         working-directory: sperm-analyzer-mobile
