@@ -79,7 +79,12 @@
     "@capacitor/splash-screen": "^6.0.0",
     "@capacitor/status-bar": "^6.0.0",
     "@capacitor/haptics": "^6.0.0",
-    "@capacitor/toast": "^6.0.0"
+    "@capacitor/toast": "^6.0.0",
+    "@tensorflow/tfjs": "^4.15.0",
+    "@tensorflow/tfjs-backend-webgl": "^4.15.0",
+    "@tensorflow/tfjs-backend-cpu": "^4.15.0",
+    "@tensorflow/tfjs-converter": "^4.15.0",
+    "@tensorflow/tfjs-core": "^4.15.0"
   },
   "engines": {
     "node": ">=18.0.0",
