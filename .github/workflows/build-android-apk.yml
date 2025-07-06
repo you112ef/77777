@@ -1,19 +1,31 @@
 name: 🧬 Build Android APK - Sperm Analyzer AI
 
 on:
-  push:
-    branches: [ main, master ]
-    tags:
-      - 'v*'
-  pull_request:
-    branches: [ main, master ]
   workflow_dispatch:
     inputs:
+      build_type:
+        description: 'Build Type'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - release
+          - debug
+      upload_artifacts:
+        description: 'Upload APK as artifacts'
+        required: true
+        default: true
+        type: boolean
       create_release:
         description: 'Create GitHub Release'
-        required: false
-        default: 'true'
+        required: true
+        default: true
         type: boolean
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, master ]
 
 env:
   NODE_VERSION: '18'
