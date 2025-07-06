@@ -67,7 +67,11 @@
     "@capacitor/cli": "^6.0.0",
     "typescript": "^5.8.3",
     "@types/node": "^20.0.0",
-    "http-server": "^14.1.1"
+    "http-server": "^14.1.1",
+    "@types/seedrandom": "^2.4.34",
+    "@types/offscreencanvas": "^2019.7.3",
+    "@types/long": "^4.0.2",
+    "@webgpu/types": "^0.1.38"
   },
   "dependencies": {
     "@capacitor/android": "^6.0.0",
@@ -79,11 +83,18 @@
     "@capacitor/status-bar": "^6.0.0",
     "@capacitor/haptics": "^6.0.0",
     "@capacitor/toast": "^6.0.0",
-    "@tensorflow/tfjs": "^4.15.0",
-    "@tensorflow/tfjs-backend-webgl": "^4.15.0",
-    "@tensorflow/tfjs-backend-cpu": "^4.15.0",
-    "@tensorflow/tfjs-converter": "^4.15.0",
-    "@tensorflow/tfjs-core": "^4.15.0"
+    "@tensorflow/tfjs": "^4.22.0",
+    "@tensorflow/tfjs-backend-webgl": "^4.22.0",
+    "@tensorflow/tfjs-backend-cpu": "^4.22.0",
+    "@tensorflow/tfjs-converter": "^4.22.0",
+    "@tensorflow/tfjs-core": "^4.22.0",
+    "@tensorflow/tfjs-data": "^4.22.0",
+    "@tensorflow/tfjs-layers": "^4.22.0",
+    "seedrandom": "^3.0.5",
+    "chalk": "^4.1.2",
+    "core-js": "^3.29.1",
+    "regenerator-runtime": "^0.13.11",
+    "yargs": "^16.2.0"
   },
   "engines": {
     "node": ">=18.0.0",
