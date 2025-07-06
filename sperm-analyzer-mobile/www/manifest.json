@@ -1,0 +1,155 @@
+{
+  "name": "محلل الحيوانات المنوية بالذكاء الاصطناعي",
+  "short_name": "محلل الحيوانات المنوية",
+  "description": "تطبيق متقدم لتحليل عينات الحيوانات المنوية باستخدام تقنيات الذكاء الاصطناعي والرؤية الحاسوبية",
+  "version": "1.0.0",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#2196F3",
+  "background_color": "#FAFAFA",
+  "lang": "ar",
+  "dir": "rtl",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "./assets/icon/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "medical",
+    "health",
+    "education",
+    "productivity"
+  ],
+  "screenshots": [
+    {
+      "src": "./assets/screenshots/home.png",
+      "sizes": "360x640",
+      "type": "image/png",
+      "label": "الصفحة الرئيسية للتطبيق"
+    },
+    {
+      "src": "./assets/screenshots/analysis.png",
+      "sizes": "360x640",
+      "type": "image/png",
+      "label": "شاشة تحليل العينة"
+    },
+    {
+      "src": "./assets/screenshots/results.png",
+      "sizes": "360x640",
+      "type": "image/png",
+      "label": "نتائج التحليل"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "تحليل عينة جديدة",
+      "short_name": "تحليل جديد",
+      "description": "بدء تحليل عينة جديدة",
+      "url": "./index.html#analyze",
+      "icons": [
+        {
+          "src": "./assets/icon/camera-icon.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "عرض السجل",
+      "short_name": "السجل",
+      "description": "عرض تاريخ التحليلات",
+      "url": "./index.html#history",
+      "icons": [
+        {
+          "src": "./assets/icon/history-icon.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.spermanalyzer.ai",
+      "id": "com.spermanalyzer.ai"
+    }
+  ],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "sperm-analyzer",
+      "url": "./index.html?action=%s"
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "./analyze",
+      "accept": {
+        "image/*": [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"],
+        "video/*": [".mp4", ".avi", ".mov", ".wmv"]
+      }
+    }
+  ],
+  "share_target": {
+    "action": "./share-analysis",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "files": [
+        {
+          "name": "image",
+          "accept": ["image/*"]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,244 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: sperm-analyzer-mobile/package-lock.json
+        
+    - name: Setup Java JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      
+    - name: Install dependencies
+      working-directory: sperm-analyzer-mobile
+      run: |
+        npm install
+        npm install -g @capacitor/cli
+        
+    - name: Build web assets
+      working-directory: sperm-analyzer-mobile
+      run: |
+        npm run build
+        
+    - name: Sync Capacitor
+      working-directory: sperm-analyzer-mobile
+      run: |
+        npx cap sync android
+        
+    - name: Grant execute permission for gradlew
+      working-directory: sperm-analyzer-mobile/android
+      run: chmod +x gradlew
+      
+    - name: Download missing gradle-wrapper.jar
+      working-directory: sperm-analyzer-mobile/android
+      run: |
+        if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
+          echo "Downloading gradle-wrapper.jar..."
+          curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.2.1/gradle/wrapper/gradle-wrapper.jar
+        fi
+        
+    - name: Build Debug APK
+      working-directory: sperm-analyzer-mobile/android
+      run: ./gradlew assembleDebug
+      
+    - name: Build Release APK
+      working-directory: sperm-analyzer-mobile/android
+      run: ./gradlew assembleRelease
+      env:
+        ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        
+    - name: Sign APK
+      working-directory: sperm-analyzer-mobile/android
+      run: |
+        if [ ! -z "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" ]; then
+          echo "Signing APK..."
+          # Create keystore directory
+          mkdir -p app/keystore
+          
+          # Decode keystore from secrets
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > app/keystore/release.keystore
+          
+          # Sign the APK
+          $ANDROID_HOME/build-tools/34.0.0/apksigner sign \
+            --ks app/keystore/release.keystore \
+            --ks-key-alias ${{ secrets.ANDROID_KEY_ALIAS }} \
+            --ks-pass pass:${{ secrets.ANDROID_KEYSTORE_PASSWORD }} \
+            --key-pass pass:${{ secrets.ANDROID_KEY_PASSWORD }} \
+            --out app/build/outputs/apk/release/app-release-signed.apk \
+            app/build/outputs/apk/release/app-release-unsigned.apk
+        else
+          echo "No signing keys provided, using unsigned APK"
+          cp app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/app-release-signed.apk
+        fi
+        
+    - name: Generate APK metadata
+      working-directory: sperm-analyzer-mobile/android
+      run: |
+        # Get APK info
+        APK_DEBUG_PATH="app/build/outputs/apk/debug/app-debug.apk"
+        APK_RELEASE_PATH="app/build/outputs/apk/release/app-release-signed.apk"
+        
+        # Create metadata file
+        cat > apk-info.json << EOF
+        {
+          "build_date": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+          "commit_sha": "${{ github.sha }}",
+          "branch": "${{ github.ref_name }}",
+          "build_number": "${{ github.run_number }}",
+          "version": "1.0.${{ github.run_number }}",
+          "files": {
+            "debug": {
+              "path": "$APK_DEBUG_PATH",
+              "size": "$(stat -c%s $APK_DEBUG_PATH 2>/dev/null || echo 0) bytes"
+            },
+            "release": {
+              "path": "$APK_RELEASE_PATH", 
+              "size": "$(stat -c%s $APK_RELEASE_PATH 2>/dev/null || echo 0) bytes"
+            }
+          }
+        }
+        EOF
+        
+    - name: Upload Debug APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: sperm-analyzer-debug-apk
+        path: sperm-analyzer-mobile/android/app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 30
+        
+    - name: Upload Release APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: sperm-analyzer-release-apk
+        path: sperm-analyzer-mobile/android/app/build/outputs/apk/release/app-release-signed.apk
+        retention-days: 90
+        
+    - name: Upload APK Metadata
+      uses: actions/upload-artifact@v4
+      with:
+        name: apk-metadata
+        path: sperm-analyzer-mobile/android/apk-info.json
+        retention-days: 90
+        
+    - name: Create Release (on tag)
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          sperm-analyzer-mobile/android/app/build/outputs/apk/debug/app-debug.apk
+          sperm-analyzer-mobile/android/app/build/outputs/apk/release/app-release-signed.apk
+          sperm-analyzer-mobile/android/apk-info.json
+        body: |
+          ## محلل الحيوانات المنوية بالذكاء الاصطناعي
+          
+          ### الميزات الجديدة في هذا الإصدار:
+          - تحليل ذكي بالذكاء الاصطناعي
+          - يعمل بدون إنترنت
+          - واجهة مستخدم محسّنة
+          - دعم اللغة العربية
+          
+          ### ملفات التحميل:
+          - `app-debug.apk` - للتطوير والاختبار
+          - `app-release-signed.apk` - للاستخدام العادي (موصى به)
+          
+          ### متطلبات النظام:
+          - Android 7.0+ (API level 24)
+          - 100 MB مساحة فارغة
+          - كاميرا للتقاط الصور
+          
+          ### كيفية التثبيت:
+          1. حمّل ملف APK
+          2. فعّل "مصادر غير معروفة" في الإعدادات
+          3. اضغط على الملف لتثبيت التطبيق
+          
+          **تنبيه**: هذا التطبيق للأغراض التعليمية والبحثية فقط
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Comment PR with APK info
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { readFileSync } = require('fs');
+          const metadata = JSON.parse(readFileSync('sperm-analyzer-mobile/android/apk-info.json', 'utf8'));
+          
+          const comment = `## 📱 APK Build Complete
+          
+          | File | Size | Download |
+          |------|------|----------|
+          | Debug APK | ${metadata.files.debug.size} | [Download](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) |
+          | Release APK | ${metadata.files.release.size} | [Download](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) |
+          
+          **Build Info:**
+          - Commit: \`${{ github.sha }}\`
+          - Build: #${{ github.run_number }}
+          - Date: ${metadata.build_date}
+          
+          To test the APK:
+          1. Download from the Actions artifacts
+          2. Install on Android device
+          3. Test the sperm analysis functionality
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+          
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: sperm-analyzer-mobile/package-lock.json
+        
+    - name: Install dependencies
+      working-directory: sperm-analyzer-mobile
+      run: npm install
+      
+    - name: Run tests
+      working-directory: sperm-analyzer-mobile
+      run: npm test
+      
+    - name: Lint code
+      working-directory: sperm-analyzer-mobile
+      run: npm run lint
