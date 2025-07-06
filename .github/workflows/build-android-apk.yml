@@ -22,10 +22,10 @@ on:
         default: true
         type: boolean
   push:
-    branches: [ main, master ]
+    branches: [ "*" ]  # All branches
     tags: [ 'v*' ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ "*" ]  # All branches
 
 env:
   NODE_VERSION: '18'
@@ -89,6 +89,45 @@ jobs:
           python -m pip install --upgrade pip
           pip install numpy tensorflow opencv-python ultralytics matplotlib scikit-learn pandas tqdm requests fastapi uvicorn
 
+      - name: 🧹 Force Clean NPM State (GitHub Actions Fix)
+        working-directory: ./sperm-analyzer-mobile
+        run: |
+          echo "🧹 FORCING CLEAN NPM STATE FOR GITHUB ACTIONS..."
+          echo "📍 Current directory: $(pwd)"
+          echo "🔍 Current branch: $(git branch --show-current)"
+          echo "📦 Node.js version: $(node --version)"
+          echo "📦 NPM version: $(npm --version)"
+          
+          # Show current files
+          echo "📁 Files before cleanup:"
+          ls -la package*.json .npmrc 2>/dev/null || echo "Some files missing"
+          
+          # FORCE delete everything NPM related
+          echo "🔥 FORCE removing all NPM files..."
+          rm -rf node_modules package-lock.json npm-shrinkwrap.json .npm 2>/dev/null || true
+          
+          # Backup original package.json and use minimal version
+          echo "📋 Using minimal package.json for initial install..."
+          cp package.json package-full.json
+          cp package-minimal.json package.json
+          
+          # Create optimal .npmrc
+          echo "📝 Creating optimized .npmrc..."
+          cat > .npmrc << 'EOF'
+          legacy-peer-deps=true
+          auto-install-peers=true
+          fund=false
+          audit=false
+          progress=false
+          loglevel=warn
+          EOF
+          
+          # Show minimal package.json dependencies
+          echo "📋 Minimal package.json dependencies:"
+          grep -A 15 '"dependencies"' package.json || echo "No dependencies section found"
+          
+          echo "✅ Clean state achieved with minimal dependencies"
+
       - name: 🔍 Verify Package Files
         working-directory: ./sperm-analyzer-mobile
         run: |
@@ -110,56 +149,103 @@ jobs:
           echo "📁 Files in current directory:"
           ls -la package*.json .npmrc 2>/dev/null || echo "Some files missing"
 
-      - name:  Install Mobile Dependencies
+      - name: 📦 Install Mobile Dependencies (Fresh Install)
         working-directory: ./sperm-analyzer-mobile
         run: |
-          echo "📦 Installing mobile app dependencies..."
-          echo "Node version: $(node --version)"
-          echo "NPM version: $(npm --version)"
-          echo "Current directory: $(pwd)"
-          echo "Package.json exists: $(test -f package.json && echo 'YES' || echo 'NO')"
-          echo "Package-lock.json exists: $(test -f package-lock.json && echo 'YES' || echo 'NO')"
+          echo "📦 FRESH NPM INSTALL - NO npm ci..."
+          echo "📍 Current directory: $(pwd)"
+          echo "📁 Files present:"
+          ls -la package*.json .npmrc
           
-          # Create .npmrc if it doesn't exist
-          if [ ! -f .npmrc ]; then
-            echo "Creating .npmrc with legacy peer deps settings..."
-            echo "legacy-peer-deps=true" > .npmrc
-            echo "auto-install-peers=true" >> .npmrc
-            echo "fund=false" >> .npmrc
-            echo "audit=false" >> .npmrc
-          fi
+          # NO npm ci - go straight to npm install
+          echo "🔧 Running fresh npm install with all optimizations..."
+          npm install \
+            --legacy-peer-deps \
+            --no-optional \
+            --no-audit \
+            --no-fund \
+            --progress=false \
+            --loglevel=warn
           
-          # Force regenerate package-lock.json if npm ci fails
-          echo "🔄 Attempting npm ci..."
-          if npm ci; then
-            echo "✅ npm ci succeeded"
+          # Verify installation success
+          echo "🔍 Verifying installation..."
+          if [ -f package-lock.json ]; then
+            echo "✅ package-lock.json created: $(wc -l < package-lock.json) lines"
           else
-            echo "⚠️ npm ci failed, trying fallback script..."
-            
-            # Use fallback script for complete clean install
-            if [ -f npm-install-fallback.sh ]; then
-              echo "🔧 Running fallback installation script..."
-              chmod +x npm-install-fallback.sh
-              ./npm-install-fallback.sh
-            else
-              echo "🔧 Fallback script not found, doing manual fallback..."
-              echo "📋 Current package.json dependencies:"
-              cat package.json | grep -A 20 '"dependencies"'
-              
-              # Remove existing lock file and node_modules
-              rm -rf package-lock.json node_modules
-              
-              # Fresh install to regenerate lock file
-              echo "🔧 Running fresh npm install..."
-              npm install --legacy-peer-deps --no-optional --no-audit
-              
-              # Now try npm ci again
-              echo "🔄 Retrying npm ci with fresh lock file..."
-              npm ci
-            fi
+            echo "❌ package-lock.json NOT created!"
+            exit 1
           fi
           
-          echo "✅ Mobile dependencies installed successfully"
+          if [ -d node_modules ]; then
+            echo "✅ node_modules created: $(ls node_modules | wc -l) packages"
+          else
+            echo "❌ node_modules NOT created!"
+            exit 1
+          fi
+          
+          # Test if we can run npm commands
+          echo "🧪 Testing npm ls..."
+          npm ls --depth=0 || echo "npm ls had warnings (normal)"
+          
+          echo "✅ Fresh NPM install completed successfully!"
+
+      - name: 🤖 Add TensorFlow.js (Separate Step)
+        working-directory: ./sperm-analyzer-mobile
+        run: |
+          echo "🤖 Adding TensorFlow.js dependencies..."
+          
+          # Add TensorFlow.js packages one by one to avoid conflicts
+          echo "📦 Installing TensorFlow.js core packages..."
+          npm install --save \
+            @tensorflow/tfjs@4.22.0 \
+            @tensorflow/tfjs-core@4.22.0 \
+            --legacy-peer-deps \
+            --no-audit \
+            --no-fund
+          
+          echo "📦 Installing TensorFlow.js backend packages..."
+          npm install --save \
+            @tensorflow/tfjs-backend-cpu@4.22.0 \
+            @tensorflow/tfjs-backend-webgl@4.22.0 \
+            --legacy-peer-deps \
+            --no-audit \
+            --no-fund
+          
+          echo "📦 Installing TensorFlow.js additional packages..."
+          npm install --save \
+            @tensorflow/tfjs-converter@4.22.0 \
+            @tensorflow/tfjs-data@4.22.0 \
+            @tensorflow/tfjs-layers@4.22.0 \
+            --legacy-peer-deps \
+            --no-audit \
+            --no-fund
+          
+          echo "📦 Installing support packages..."
+          npm install --save \
+            seedrandom@3.0.5 \
+            chalk@4.1.2 \
+            core-js@3.29.1 \
+            regenerator-runtime@0.13.11 \
+            yargs@16.2.0 \
+            --legacy-peer-deps \
+            --no-audit \
+            --no-fund
+          
+          # Install TypeScript types
+          echo "📦 Installing TypeScript types..."
+          npm install --save-dev \
+            @types/seedrandom@2.4.34 \
+            @types/offscreencanvas@2019.7.3 \
+            @types/long@4.0.2 \
+            @webgpu/types@0.1.38 \
+            --legacy-peer-deps \
+            --no-audit \
+            --no-fund
+          
+          echo "🔍 Verifying TensorFlow.js installation..."
+          npm ls @tensorflow/tfjs --depth=0 || echo "TensorFlow.js installed with warnings (normal)"
+          
+          echo "✅ TensorFlow.js installation completed!"
 
       - name: 🏗️ Build Mobile App
         working-directory: ./sperm-analyzer-mobile
