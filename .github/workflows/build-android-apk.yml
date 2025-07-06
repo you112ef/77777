@@ -95,21 +95,37 @@ jobs:
           echo "📦 Installing mobile app dependencies..."
           echo "Node version: $(node --version)"
           echo "NPM version: $(npm --version)"
+          echo "Current directory: $(pwd)"
+          echo "Package.json exists: $(test -f package.json && echo 'YES' || echo 'NO')"
+          echo "Package-lock.json exists: $(test -f package-lock.json && echo 'YES' || echo 'NO')"
           
           # Create .npmrc if it doesn't exist
           if [ ! -f .npmrc ]; then
+            echo "Creating .npmrc with legacy peer deps settings..."
             echo "legacy-peer-deps=true" > .npmrc
             echo "auto-install-peers=true" >> .npmrc
             echo "fund=false" >> .npmrc
             echo "audit=false" >> .npmrc
           fi
           
-          # Try npm ci first, fallback to npm install if it fails
-          if ! npm ci; then
-            echo "⚠️ npm ci failed, falling back to npm install..."
-            rm -f package-lock.json
-            npm install
-            echo "✅ npm install completed, now running npm ci..."
+          # Force regenerate package-lock.json if npm ci fails
+          echo "🔄 Attempting npm ci..."
+          if npm ci; then
+            echo "✅ npm ci succeeded"
+          else
+            echo "⚠️ npm ci failed, regenerating package-lock.json..."
+            echo "📋 Current package.json dependencies:"
+            cat package.json | grep -A 20 '"dependencies"'
+            
+            # Remove existing lock file and node_modules
+            rm -rf package-lock.json node_modules
+            
+            # Fresh install to regenerate lock file
+            echo "🔧 Running fresh npm install..."
+            npm install --legacy-peer-deps
+            
+            # Now try npm ci again
+            echo "🔄 Retrying npm ci with fresh lock file..."
             npm ci
           fi
           
