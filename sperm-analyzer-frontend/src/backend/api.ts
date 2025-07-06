@@ -137,7 +137,7 @@ export class SpermAnalyzerAPI {
       formData.append('file', request.file);
       formData.append('analysis_type', request.analysisType);
 
-      const response = await fetch(`${this.baseURL}/analyze`, {
+      const response = await fetch(`${this.baseURL}/analysis/start`, {
         method: 'POST',
         body: formData,
       });
@@ -185,7 +185,7 @@ export class SpermAnalyzerAPI {
   // List all analyses
   async listAnalyses(): Promise<{analyses: any[]}> {
     try {
-      const response = await fetch(`${this.baseURL}/analysis/list`);
+      const response = await fetch(`${this.baseURL}/analyses`);
       if (!response.ok) {
         throw new Error(`List analyses failed: ${response.status}`);
       }
@@ -215,7 +215,7 @@ export class SpermAnalyzerAPI {
   // Export results as CSV
   async exportCSV(analysisId: string): Promise<Blob> {
     try {
-      const response = await fetch(`${this.baseURL}/export/${analysisId}/csv`);
+      const response = await fetch(`${this.baseURL}/analysis/${analysisId}/export/csv`);
       if (!response.ok) {
         throw new Error(`CSV export failed: ${response.status}`);
       }
