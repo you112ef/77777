@@ -89,7 +89,28 @@ jobs:
           python -m pip install --upgrade pip
           pip install numpy tensorflow opencv-python ultralytics matplotlib scikit-learn pandas tqdm requests fastapi uvicorn
 
-      - name: 📦 Install Mobile Dependencies
+      - name: 🔍 Verify Package Files
+        working-directory: ./sperm-analyzer-mobile
+        run: |
+          echo "🔍 Verifying package files before npm ci..."
+          echo "📋 Package.json TensorFlow.js versions:"
+          grep -A 10 '"@tensorflow/tfjs"' package.json || echo "TensorFlow.js not found in package.json"
+          
+          echo "📋 Package.json devDependencies:"
+          grep -A 10 '"devDependencies"' package.json || echo "No devDependencies found"
+          
+          if [ -f package-lock.json ]; then
+            echo "📋 Package-lock.json TensorFlow.js versions:"
+            grep '"@tensorflow/tfjs"' package-lock.json || echo "TensorFlow.js not found in package-lock.json"
+            echo "📊 Package-lock.json size: $(wc -l < package-lock.json) lines"
+          else
+            echo "⚠️ package-lock.json does not exist!"
+          fi
+          
+          echo "📁 Files in current directory:"
+          ls -la package*.json .npmrc 2>/dev/null || echo "Some files missing"
+
+      - name:  Install Mobile Dependencies
         working-directory: ./sperm-analyzer-mobile
         run: |
           echo "📦 Installing mobile app dependencies..."
@@ -113,20 +134,29 @@ jobs:
           if npm ci; then
             echo "✅ npm ci succeeded"
           else
-            echo "⚠️ npm ci failed, regenerating package-lock.json..."
-            echo "📋 Current package.json dependencies:"
-            cat package.json | grep -A 20 '"dependencies"'
+            echo "⚠️ npm ci failed, trying fallback script..."
             
-            # Remove existing lock file and node_modules
-            rm -rf package-lock.json node_modules
-            
-            # Fresh install to regenerate lock file
-            echo "🔧 Running fresh npm install..."
-            npm install --legacy-peer-deps
-            
-            # Now try npm ci again
-            echo "🔄 Retrying npm ci with fresh lock file..."
-            npm ci
+            # Use fallback script for complete clean install
+            if [ -f npm-install-fallback.sh ]; then
+              echo "🔧 Running fallback installation script..."
+              chmod +x npm-install-fallback.sh
+              ./npm-install-fallback.sh
+            else
+              echo "🔧 Fallback script not found, doing manual fallback..."
+              echo "📋 Current package.json dependencies:"
+              cat package.json | grep -A 20 '"dependencies"'
+              
+              # Remove existing lock file and node_modules
+              rm -rf package-lock.json node_modules
+              
+              # Fresh install to regenerate lock file
+              echo "🔧 Running fresh npm install..."
+              npm install --legacy-peer-deps --no-optional --no-audit
+              
+              # Now try npm ci again
+              echo "🔄 Retrying npm ci with fresh lock file..."
+              npm ci
+            fi
           fi
           
           echo "✅ Mobile dependencies installed successfully"
