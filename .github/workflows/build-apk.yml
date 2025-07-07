@@ -21,7 +21,7 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
-        cache-dependency-path: 'sperm-analyzer-mobile/package-lock.json'
+        cache-dependency-path: 'sperm-analyzer-mobile/package.json'
     
     - name: ☕ Setup Java
       uses: actions/setup-java@v4
@@ -35,7 +35,7 @@ jobs:
     - name: 📦 Install dependencies
       working-directory: ./sperm-analyzer-mobile
       run: |
-        npm ci
+        npm ci --legacy-peer-deps || npm install --legacy-peer-deps
         npm install -g @capacitor/cli
     
     - name: 🔨 Build app
@@ -44,17 +44,43 @@ jobs:
         npm run build
         npx cap sync android
     
-    - name: 📱 Build APK
+    - name: 🔐 Create debug keystore
+      working-directory: ./sperm-analyzer-mobile/android
+      run: |
+        mkdir -p app
+        keytool -genkey -v -keystore app/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "C=US, O=Android, CN=Android Debug"
+    
+    - name: 📱 Build Debug APK
       working-directory: ./sperm-analyzer-mobile/android
       run: |
         chmod +x gradlew
-        ./gradlew assembleDebug
+        ./gradlew assembleDebug --stacktrace
+    
+    - name: 📋 List APK files
+      working-directory: ./sperm-analyzer-mobile/android
+      run: |
+        echo "🔍 Looking for APK files:"
+        find . -name "*.apk" -type f
+        ls -la app/build/outputs/apk/debug/ || echo "Debug directory not found"
     
     - name: 📤 Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: sperm-analyzer-ai-apk
+        name: sperm-analyzer-ai-debug-apk
         path: sperm-analyzer-mobile/android/app/build/outputs/apk/debug/app-debug.apk
+        if-no-files-found: error
+    
+    - name: 📊 APK Info
+      working-directory: ./sperm-analyzer-mobile/android
+      run: |
+        if [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
+          echo "✅ APK built successfully!"
+          echo "📏 APK Size: $(du -h app/build/outputs/apk/debug/app-debug.apk | cut -f1)"
+          echo "📱 APK Path: app/build/outputs/apk/debug/app-debug.apk"
+        else
+          echo "❌ APK not found!"
+          exit 1
+        fi
 
   test:
     runs-on: ubuntu-latest
