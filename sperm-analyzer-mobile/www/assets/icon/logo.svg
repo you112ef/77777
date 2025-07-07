@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00B4D8;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0077B6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#03045E;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00F5FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00BCD4;stop-opacity:1" />
+    </linearGradient>
+    
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="90" fill="url(#primaryGradient)" filter="url(#shadow)"/>
+  
+  <!-- Inner Ring -->
+  <circle cx="100" cy="100" r="75" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  
+  <!-- Microscope Base -->
+  <rect x="85" y="140" width="30" height="25" rx="4" fill="rgba(255,255,255,0.9)"/>
+  <rect x="80" y="160" width="40" height="8" rx="4" fill="rgba(255,255,255,0.7)"/>
+  
+  <!-- Microscope Body -->
+  <rect x="90" y="120" width="20" height="25" rx="2" fill="rgba(255,255,255,0.9)"/>
+  <rect x="95" y="110" width="10" height="15" rx="5" fill="rgba(255,255,255,0.8)"/>
+  
+  <!-- Objective Lens -->
+  <circle cx="100" cy="115" r="6" fill="rgba(255,255,255,0.9)"/>
+  <circle cx="100" cy="115" r="3" fill="url(#accentGradient)"/>
+  
+  <!-- DNA/Cell Representation -->
+  <g transform="translate(100, 70)">
+    <!-- Central Cell -->
+    <circle cx="0" cy="0" r="12" fill="url(#accentGradient)" opacity="0.8" filter="url(#glow)"/>
+    <circle cx="0" cy="0" r="8" fill="rgba(255,255,255,0.9)"/>
+    <circle cx="0" cy="0" r="4" fill="url(#primaryGradient)"/>
+    
+    <!-- Surrounding Elements -->
+    <circle cx="-20" cy="-10" r="4" fill="rgba(255,255,255,0.7)"/>
+    <circle cx="20" cy="10" r="4" fill="rgba(255,255,255,0.7)"/>
+    <circle cx="15" cy="-15" r="3" fill="rgba(255,255,255,0.6)"/>
+    <circle cx="-15" cy="15" r="3" fill="rgba(255,255,255,0.6)"/>
+    
+    <!-- Motion Lines -->
+    <path d="M -25 -5 Q -20 -8 -15 -5" stroke="rgba(255,255,255,0.6)" stroke-width="2" fill="none"/>
+    <path d="M 15 15 Q 20 12 25 15" stroke="rgba(255,255,255,0.6)" stroke-width="2" fill="none"/>
+  </g>
+  
+  <!-- AI Brain Symbol -->
+  <g transform="translate(100, 40)">
+    <!-- Brain Outline -->
+    <path d="M -12 -5 Q -15 -12 -8 -15 Q 0 -18 8 -15 Q 15 -12 12 -5 Q 15 2 8 8 Q 0 12 -8 8 Q -15 2 -12 -5" 
+          fill="rgba(255,255,255,0.8)" stroke="url(#accentGradient)" stroke-width="2"/>
+    
+    <!-- Neural Network Nodes -->
+    <circle cx="-6" cy="-3" r="1.5" fill="url(#accentGradient)"/>
+    <circle cx="0" cy="-6" r="1.5" fill="url(#accentGradient)"/>
+    <circle cx="6" cy="-3" r="1.5" fill="url(#accentGradient)"/>
+    <circle cx="-3" cy="2" r="1.5" fill="url(#accentGradient)"/>
+    <circle cx="3" cy="2" r="1.5" fill="url(#accentGradient)"/>
+    
+    <!-- Neural Connections -->
+    <line x1="-6" y1="-3" x2="0" y2="-6" stroke="url(#accentGradient)" stroke-width="1" opacity="0.7"/>
+    <line x1="0" y1="-6" x2="6" y2="-3" stroke="url(#accentGradient)" stroke-width="1" opacity="0.7"/>
+    <line x1="-6" y1="-3" x2="-3" y2="2" stroke="url(#accentGradient)" stroke-width="1" opacity="0.7"/>
+    <line x1="6" y1="-3" x2="3" y2="2" stroke="url(#accentGradient)" stroke-width="1" opacity="0.7"/>
+    <line x1="-3" y1="2" x2="3" y2="2" stroke="url(#accentGradient)" stroke-width="1" opacity="0.7"/>
+  </g>
+  
+  <!-- Decorative Elements -->
+  <g opacity="0.3">
+    <!-- Data Points -->
+    <circle cx="60" cy="60" r="2" fill="rgba(255,255,255,0.8)">
+      <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="140" cy="140" r="2" fill="rgba(255,255,255,0.8)">
+      <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="140" cy="60" r="1.5" fill="rgba(255,255,255,0.8)">
+      <animate attributeName="opacity" values="0.3;0.8;0.3" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="60" cy="140" r="1.5" fill="rgba(255,255,255,0.8)">
+      <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

@@ -1,0 +1,237 @@
+# 📱 Sperm Analyzer AI - Git Ignore File
+
+# 🏗️ Build outputs
+sperm-analyzer-mobile/dist/
+sperm-analyzer-mobile/build/
+sperm-analyzer-mobile/www/build/
+sperm-analyzer-mobile/android/app/build/
+sperm-analyzer-mobile/android/build/
+sperm-analyzer-mobile/android/.gradle/
+sperm-analyzer-mobile/android/app/src/main/assets/public/
+
+# 📦 Dependencies
+node_modules/
+sperm-analyzer-mobile/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+
+# 🧠 AI Models (large files)
+*.h5
+*.pb
+*.tflite
+*.onnx
+*.pt
+*.pth
+*.model
+*.weights
+sperm-analyzer-mobile/www/assets/models/*.h5
+sperm-analyzer-mobile/www/assets/models/*.tflite
+sperm-analyzer-mobile/www/assets/models/*.onnx
+
+# 📱 Mobile specific
+sperm-analyzer-mobile/android/app/release/
+sperm-analyzer-mobile/android/app/debug/
+sperm-analyzer-mobile/android/app/src/main/assets/capacitor.config.json
+sperm-analyzer-mobile/android/app/src/main/assets/capacitor.plugins.json
+sperm-analyzer-mobile/android/app/src/main/res/raw/
+sperm-analyzer-mobile/android/keystore/
+sperm-analyzer-mobile/android/gradle/wrapper/gradle-wrapper.jar
+*.keystore
+*.jks
+
+# 🔧 IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# 📊 Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+.grunt
+
+# 📄 Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# 🔐 Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.example
+
+# 🧪 Testing
+coverage/
+*.lcov
+.nyc_output
+.coverage
+htmlcov/
+.tox/
+.nox/
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# 💾 Temporary files
+tmp/
+temp/
+.tmp/
+.temp/
+
+# 🗃️ Cache directories
+.cache/
+.npm
+.eslintcache
+.parcel-cache/
+.next/
+.nuxt/
+.vuepress/dist
+
+# 📸 Generated content
+screenshots/
+test-results/
+*.screenshot.png
+
+# 🔄 Backup files
+*.bak
+*.backup
+*.old
+*.orig
+
+# 🏗️ Build tools
+.sass-cache/
+connect.lock
+typings/
+
+# 🌐 Web specific
+public/build/
+public/dist/
+.svelte-kit/
+
+# 📦 Package managers
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# 🐍 Python (for AI model training)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# 🔬 Jupyter Notebook
+.ipynb_checkpoints
+
+# 🧮 Scientific Python
+.spyderproject
+.spyproject
+.ropeproject
+
+# 📊 Data files (sensitive medical data)
+*.csv
+*.xlsx
+*.json.backup
+data/
+datasets/
+samples/
+test-images/
+real-data/
+
+# 🔒 Security
+*.p12
+*.pem
+*.key
+*.crt
+*.cert
+google-services.json
+GoogleService-Info.plist
+
+# 🏥 Medical data (compliance)
+patient-data/
+medical-samples/
+hipaa-data/
+phi-data/
+
+# 🎯 Specific to this project
+sperm-analyzer-ai/models/trained/
+sperm-analyzer-ai/datasets/
+sperm-analyzer-ai/experiments/
+sperm-analyzer-mobile/capacitor.config.ts.backup
+sperm-analyzer-mobile/android/local.properties
+sperm-analyzer-mobile/android/gradle.properties.backup
+
+# 🚀 Deployment
+deploy/
+release/
+releases/
+artifacts/
+
+# 🎨 Design files
+*.sketch
+*.fig
+*.psd
+*.ai
+
+# 📹 Media files
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.webm
+*.mkv
+
+# 🖼️ Large images
+*.tiff
+*.raw
+*.cr2
+*.nef
+*.arw
+
+# 📱 Platform specific
+.android/
+.ios/
+platforms/
+
+# ⚡ Capacitor
+.capacitor/
+android/
+ios/
+
+# 🎉 Success! Repository is ready for GitHub

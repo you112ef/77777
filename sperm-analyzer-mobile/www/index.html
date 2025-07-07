@@ -69,6 +69,10 @@
                         <i class="material-icons">history</i>
                         <span>السجل</span>
                     </li>
+                    <li class="nav-item" data-page="graphs">
+                        <i class="material-icons">bar_chart</i>
+                        <span>الرسوم البيانية</span>
+                    </li>
                     <li class="nav-item" data-page="reports">
                         <i class="material-icons">assessment</i>
                         <span>التقارير</span>
@@ -282,6 +286,178 @@
                     </div>
                 </div>
 
+                <!-- Graphs Page -->
+                <div id="graphs-page" class="page">
+                    <div class="page-header">
+                        <h2>الرسوم البيانية</h2>
+                        <p>عرض مرئي لنتائج التحليلات</p>
+                    </div>
+
+                    <!-- Analysis Selector -->
+                    <div class="analysis-selector">
+                        <select id="analysis-select" class="form-control">
+                            <option value="">-- اختر تحليل لعرض الرسوم البيانية --</option>
+                        </select>
+                    </div>
+
+                    <!-- Chart Tabs -->
+                    <div class="chart-tabs">
+                        <div class="tab-buttons">
+                            <button class="tab-btn active" data-chart="motility">
+                                <i class="material-icons">trending_up</i>
+                                <span>الحركة</span>
+                            </button>
+                            <button class="tab-btn" data-chart="velocity">
+                                <i class="material-icons">speed</i>
+                                <span>السرعة</span>
+                            </button>
+                            <button class="tab-btn" data-chart="morphology">
+                                <i class="material-icons">scatter_plot</i>
+                                <span>الشكل</span>
+                            </button>
+                            <button class="tab-btn" data-chart="who">
+                                <i class="material-icons">assessment</i>
+                                <span>معايير WHO</span>
+                            </button>
+                            <button class="tab-btn" data-chart="timeline">
+                                <i class="material-icons">timeline</i>
+                                <span>الخط الزمني</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Chart Container -->
+                    <div id="chart-container" class="chart-container">
+                        <!-- Motility Chart -->
+                        <div id="motility-chart" class="chart-section active">
+                            <div class="chart-card">
+                                <h3>توزيع الحركة</h3>
+                                <div class="chart-wrapper">
+                                    <canvas id="motility-canvas" class="chart-canvas"></canvas>
+                                </div>
+                                <div class="chart-legend">
+                                    <div class="legend-item">
+                                        <div class="legend-color" style="background-color: #4CAF50;"></div>
+                                        <span>متقدمة</span>
+                                        <span id="progressive-value" class="legend-value">--</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color" style="background-color: #FF9800;"></div>
+                                        <span>غير متقدمة</span>
+                                        <span id="non-progressive-value" class="legend-value">--</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color" style="background-color: #F44336;"></div>
+                                        <span>غير متحركة</span>
+                                        <span id="immotile-value" class="legend-value">--</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Velocity Chart -->
+                        <div id="velocity-chart" class="chart-section">
+                            <div class="chart-card">
+                                <h3>قياسات السرعة</h3>
+                                <div class="chart-wrapper">
+                                    <canvas id="velocity-canvas" class="chart-canvas"></canvas>
+                                </div>
+                                <div class="velocity-metrics">
+                                    <div class="metric-item">
+                                        <span class="metric-label">VCL (السرعة المنحنية)</span>
+                                        <span id="vcl-value" class="metric-value">-- μm/s</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">VSL (السرعة المستقيمة)</span>
+                                        <span id="vsl-value" class="metric-value">-- μm/s</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">VAP (متوسط السرعة)</span>
+                                        <span id="vap-value" class="metric-value">-- μm/s</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Count Over Time Chart -->
+                        <div id="count-chart" class="chart-section">
+                            <div class="chart-card">
+                                <h3>العدد عبر الزمن</h3>
+                                <div class="chart-wrapper">
+                                    <canvas id="count-canvas" class="chart-canvas"></canvas>
+                                </div>
+                                <div class="count-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">متوسط العدد</span>
+                                        <span id="avg-count-value" class="stat-value">--</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">أقصى عدد</span>
+                                        <span id="max-count-value" class="stat-value">--</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">المدة الكلية</span>
+                                        <span id="duration-value" class="stat-value">-- ثانية</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Morphology Chart -->
+                        <div id="morphology-chart" class="chart-section">
+                            <div class="chart-card">
+                                <h3>توزيع الشكل المورفولوجي</h3>
+                                <div class="chart-wrapper">
+                                    <canvas id="morphology-canvas" class="chart-canvas"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- WHO Compliance Chart -->
+                        <div id="who-chart" class="chart-section">
+                            <div class="chart-card">
+                                <h3>التوافق مع معايير WHO</h3>
+                                <div class="chart-wrapper">
+                                    <canvas id="who-compliance-canvas" class="chart-canvas"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Timeline Chart -->
+                        <div id="timeline-chart" class="chart-section">
+                            <div class="chart-card">
+                                <h3>خط زمني للتحاليل</h3>
+                                <div class="chart-wrapper">
+                                    <canvas id="timeline-canvas" class="chart-canvas"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- No Data State -->
+                    <div id="no-graph-data" class="empty-state">
+                        <i class="material-icons">insert_chart</i>
+                        <h3>لا توجد بيانات للرسوم البيانية</h3>
+                        <p>أكمل تحليل عينة أولاً لعرض الرسوم البيانية</p>
+                        <button class="action-btn primary" onclick="showPage('analyze')">
+                            <i class="material-icons">camera_alt</i>
+                            <span>تحليل عينة</span>
+                        </button>
+                    </div>
+
+                    <!-- Export Actions -->
+                    <div id="graph-actions" class="graph-actions">
+                        <button id="export-chart-btn" class="action-btn secondary">
+                            <i class="material-icons">file_download</i>
+                            <span>تصدير الرسم البياني</span>
+                        </button>
+                        <button id="share-chart-btn" class="action-btn secondary">
+                            <i class="material-icons">share</i>
+                            <span>مشاركة</span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Reports Page -->
                 <div id="reports-page" class="page">
                     <div class="page-header">
@@ -356,10 +532,12 @@
     <script src="js/capacitor.js"></script>
     <script src="js/tf.min.js"></script>
     <script src="js/cv.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/camera.js"></script>
-    <script src="js/analyzer.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/ui.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="js/real-sperm-analyzer.js"></script>
+    <script src="js/real-camera-system.js"></script>
+    <script src="js/real-chart-manager.js"></script>
+    <script src="js/real-data-exporter.js"></script>
+    <script src="js/real-app.js"></script>
 </body>
 </html>

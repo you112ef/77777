@@ -29,7 +29,7 @@ import {
   Filler
 } from 'chart.js';
 import { Line, Bar, Pie, Doughnut } from 'react-chartjs-2';
-import devApiClient, { AnalysisResult, CASAMetrics, VideoMetrics } from '@/backend/api';
+import { devApiClient, AnalysisResult, CASAMetrics, VideoMetrics } from '@/backend/api';
 
 // Register Chart.js components
 ChartJS.register(
