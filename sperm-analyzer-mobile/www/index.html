@@ -293,30 +293,37 @@
                         <p>عرض مرئي لنتائج التحليلات</p>
                     </div>
 
-                    <!-- Chart Type Selector -->
-                    <div class="chart-selector">
-                        <div class="selector-buttons">
-                            <button class="chart-btn active" data-chart="motility">
-                                <i class="material-icons">donut_large</i>
-                                <span>الحركة</span>
-                            </button>
-                            <button class="chart-btn" data-chart="velocity">
-                                <i class="material-icons">timeline</i>
-                                <span>السرعة</span>
-                            </button>
-                            <button class="chart-btn" data-chart="count">
-                                <i class="material-icons">show_chart</i>
-                                <span>العدد</span>
-                            </button>
-                        </div>
+                    <!-- Analysis Selector -->
+                    <div class="analysis-selector">
+                        <select id="analysis-select" class="form-control">
+                            <option value="">-- اختر تحليل لعرض الرسوم البيانية --</option>
+                        </select>
                     </div>
 
-                    <!-- Analysis Selector -->
-                    <div id="analysis-selector" class="analysis-selector">
-                        <label for="analysis-select">اختر تحليل:</label>
-                        <select id="analysis-select" class="select-input">
-                            <option value="">-- اختر تحليل --</option>
-                        </select>
+                    <!-- Chart Tabs -->
+                    <div class="chart-tabs">
+                        <div class="tab-buttons">
+                            <button class="tab-btn active" data-chart="motility">
+                                <i class="material-icons">trending_up</i>
+                                <span>الحركة</span>
+                            </button>
+                            <button class="tab-btn" data-chart="velocity">
+                                <i class="material-icons">speed</i>
+                                <span>السرعة</span>
+                            </button>
+                            <button class="tab-btn" data-chart="morphology">
+                                <i class="material-icons">scatter_plot</i>
+                                <span>الشكل</span>
+                            </button>
+                            <button class="tab-btn" data-chart="who">
+                                <i class="material-icons">assessment</i>
+                                <span>معايير WHO</span>
+                            </button>
+                            <button class="tab-btn" data-chart="timeline">
+                                <i class="material-icons">timeline</i>
+                                <span>الخط الزمني</span>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Chart Container -->
@@ -392,6 +399,36 @@
                                         <span class="stat-label">المدة الكلية</span>
                                         <span id="duration-value" class="stat-value">-- ثانية</span>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Morphology Chart -->
+                        <div id="morphology-chart" class="chart-section">
+                            <div class="chart-card">
+                                <h3>توزيع الشكل المورفولوجي</h3>
+                                <div class="chart-wrapper">
+                                    <canvas id="morphology-canvas" class="chart-canvas"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- WHO Compliance Chart -->
+                        <div id="who-chart" class="chart-section">
+                            <div class="chart-card">
+                                <h3>التوافق مع معايير WHO</h3>
+                                <div class="chart-wrapper">
+                                    <canvas id="who-compliance-canvas" class="chart-canvas"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Timeline Chart -->
+                        <div id="timeline-chart" class="chart-section">
+                            <div class="chart-card">
+                                <h3>خط زمني للتحاليل</h3>
+                                <div class="chart-wrapper">
+                                    <canvas id="timeline-canvas" class="chart-canvas"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -495,13 +532,12 @@
     <script src="js/capacitor.js"></script>
     <script src="js/tf.min.js"></script>
     <script src="js/cv.js"></script>
-    <script src="js/enhanced-ai-processor.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/camera.js"></script>
-    <script src="js/analyzer.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/charts.js"></script>
-    <script src="js/ui.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="js/real-sperm-analyzer.js"></script>
+    <script src="js/real-camera-system.js"></script>
+    <script src="js/real-chart-manager.js"></script>
+    <script src="js/real-data-exporter.js"></script>
+    <script src="js/real-app.js"></script>
 </body>
 </html>
