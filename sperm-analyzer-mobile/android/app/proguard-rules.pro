@@ -70,7 +70,7 @@
 }
 
 # Keep all classes in the main package
--keep class com.scrapybara.spermanalyzer.** { *; }
+-keep class com.spermanalyzer.ai.** { *; }
 
 # General Android rules
 -keep public class * extends android.app.Activity
