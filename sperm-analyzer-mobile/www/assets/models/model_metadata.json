@@ -7,27 +7,25 @@
   "preprocessing": {
     "normalize": true,
     "mean": [0.485, 0.456, 0.406],
-    "std": [0.229, 0.224, 0.225]
+    "std": [0.229, 0.224, 0.225],
+    "resize_target": [640, 640]
   },
   "postprocessing": {
     "confidence_threshold": 0.5,
-    "nms_threshold": 0.4
+    "nms_threshold": 0.4,
+    "max_detections": 100
   },
   "training_info": {
     "framework": "TensorFlow Lite",
     "architecture": "CNN with detection head",
-    "dataset_size": 10000,
-    "training_epochs": 100,
-    "validation_accuracy": 0.94
+    "dataset_size": 1000,
+    "epochs": 10,
+    "accuracy": 0.85
   },
   "performance": {
     "inference_time_ms": 200,
     "model_size_mb": 5.2,
-    "supported_devices": ["android", "ios", "web"],
-    "accuracy": 0.94,
-    "precision": 0.91,
-    "recall": 0.89,
-    "f1_score": 0.90
+    "supported_devices": ["android", "ios", "web"]
   },
   "medical_standards": {
     "casa_compliance": true,

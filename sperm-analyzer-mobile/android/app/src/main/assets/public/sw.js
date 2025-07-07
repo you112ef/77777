@@ -1,286 +1,238 @@
-// Service Worker for Offline Sperm Analyzer
+// Service Worker for Sperm Analyzer AI
+// Enables offline functionality
 
-const CACHE_NAME = 'sperm-analyzer-v1.0.0';
-const OFFLINE_URL = '/index-offline.html';
-
-// Files to cache for offline functionality
-const FILES_TO_CACHE = [
-  '/',
-  '/index-offline.html',
-  '/css/unified-styles.css',
-  '/css/offline-styles.css',
-  '/js/local-ai-processor.js',
-  '/js/app-offline.js',
-  '/logo.svg',
-  '/icon-simple.svg',
-  '/manifest-improved.json',
-  '/assets/models/sperm_detector.tflite',
-  '/assets/models/model_metadata.json',
-  '/assets/models/model_info.json',
-  '/assets/icons/icon-128x128.png',
-  '/assets/icons/icon-192x192.png',
-  'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js',
-  'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl@4.15.0/dist/tf-backend-webgl.min.js',
-  'https://fonts.googleapis.com/icon?family=Material+Icons'
+const CACHE_NAME = 'sperm-analyzer-v1';
+const urlsToCache = [
+    './',
+    './index.html',
+    './css/style.css',
+    './css/components.css',
+    './js/app.js',
+    './js/capacitor.js',
+    './js/tf.min.js',
+    './js/cv.js',
+    './js/camera.js',
+    './js/analyzer.js',
+    './js/storage.js',
+    './js/ui.js',
+    './assets/icon/icon.png',
+    './assets/icon/logo.png',
+    './manifest.json'
 ];
 
-// Install event
-self.addEventListener('install', (event) => {
-  console.log('[SW] Install event');
-  
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('[SW] Caching files');
-        return cache.addAll(FILES_TO_CACHE);
-      })
-      .then(() => {
-        console.log('[SW] Files cached successfully');
-        return self.skipWaiting();
-      })
-      .catch((error) => {
-        console.error('[SW] Caching failed:', error);
-      })
-  );
-});
-
-// Activate event
-self.addEventListener('activate', (event) => {
-  console.log('[SW] Activate event');
-  
-  event.waitUntil(
-    caches.keys()
-      .then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => {
-            if (cacheName !== CACHE_NAME) {
-              console.log('[SW] Deleting old cache:', cacheName);
-              return caches.delete(cacheName);
-            }
-          })
-        );
-      })
-      .then(() => {
-        console.log('[SW] Claiming clients');
-        return self.clients.claim();
-      })
-  );
-});
-
-// Fetch event
-self.addEventListener('fetch', (event) => {
-  // Handle different types of requests
-  if (event.request.method !== 'GET') {
-    return;
-  }
-  
-  // Handle navigation requests
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request)
-        .catch(() => {
-          return caches.open(CACHE_NAME)
-            .then((cache) => {
-              return cache.match(OFFLINE_URL);
-            });
-        })
+// Install event - cache resources
+self.addEventListener('install', event => {
+    console.log('[SW] Install event');
+    
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => {
+                console.log('[SW] Caching app shell');
+                return cache.addAll(urlsToCache);
+            })
+            .catch(error => {
+                console.error('[SW] Error caching:', error);
+            })
     );
-    return;
-  }
-  
-  // Handle TensorFlow.js and model files
-  if (event.request.url.includes('tensorflow') || 
-      event.request.url.includes('.tflite') ||
-      event.request.url.includes('model_')) {
-    event.respondWith(
-      caches.open(CACHE_NAME)
-        .then((cache) => {
-          return cache.match(event.request)
-            .then((response) => {
-              if (response) {
-                console.log('[SW] Serving from cache:', event.request.url);
-                return response;
-              }
-              
-              return fetch(event.request)
-                .then((response) => {
-                  // Cache successful responses
-                  if (response.status === 200) {
-                    cache.put(event.request, response.clone());
-                  }
-                  return response;
+    
+    // Skip waiting to activate immediately
+    self.skipWaiting();
+});
+
+// Activate event - clean up old caches
+self.addEventListener('activate', event => {
+    console.log('[SW] Activate event');
+    
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cacheName => {
+                    if (cacheName !== CACHE_NAME) {
+                        console.log('[SW] Deleting old cache:', cacheName);
+                        return caches.delete(cacheName);
+                    }
                 })
-                .catch(() => {
-                  console.log('[SW] Failed to fetch:', event.request.url);
-                  return new Response('Offline - Resource not available', {
-                    status: 503,
-                    statusText: 'Service Unavailable'
-                  });
-                });
-            });
+            );
         })
     );
-    return;
-  }
-  
-  // Handle other requests with cache-first strategy
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        if (response) {
-          return response;
-        }
-        
-        return fetch(event.request)
-          .then((response) => {
-            // Don't cache POST requests or non-successful responses
-            if (event.request.method === 'GET' && response.status === 200) {
-              const responseClone = response.clone();
-              caches.open(CACHE_NAME)
-                .then((cache) => {
-                  cache.put(event.request, responseClone);
+    
+    // Claim all clients immediately
+    self.clients.claim();
+});
+
+// Fetch event - serve from cache, fallback to network
+self.addEventListener('fetch', event => {
+    // Skip non-GET requests
+    if (event.request.method !== 'GET') {
+        return;
+    }
+    
+    // Skip chrome-extension requests
+    if (event.request.url.startsWith('chrome-extension://')) {
+        return;
+    }
+    
+    event.respondWith(
+        caches.match(event.request)
+            .then(response => {
+                // Return cached version if available
+                if (response) {
+                    console.log('[SW] Serving from cache:', event.request.url);
+                    return response;
+                }
+                
+                // Fallback to network
+                console.log('[SW] Fetching from network:', event.request.url);
+                return fetch(event.request).then(response => {
+                    // Don't cache if not a valid response
+                    if (!response || response.status !== 200 || response.type !== 'basic') {
+                        return response;
+                    }
+                    
+                    // Clone the response
+                    const responseToCache = response.clone();
+                    
+                    caches.open(CACHE_NAME)
+                        .then(cache => {
+                            cache.put(event.request, responseToCache);
+                        });
+                    
+                    return response;
                 });
-            }
-            return response;
-          })
-          .catch(() => {
-            // Return offline page for navigation requests
-            if (event.request.destination === 'document') {
-              return caches.match(OFFLINE_URL);
-            }
-            
-            // Return empty response for other requests
-            return new Response('', {
-              status: 503,
-              statusText: 'Service Unavailable'
-            });
-          });
-      })
-  );
+            })
+            .catch(error => {
+                console.error('[SW] Fetch failed:', error);
+                
+                // Return offline fallback for navigation requests
+                if (event.request.mode === 'navigate') {
+                    return caches.match('./index.html');
+                }
+                
+                throw error;
+            })
+    );
 });
 
 // Background sync for analysis results
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'background-sync-analysis') {
-    event.waitUntil(syncAnalysisResults());
-  }
-});
-
-async function syncAnalysisResults() {
-  try {
-    // Get pending analysis results from IndexedDB
-    const pendingResults = await getPendingAnalysisResults();
+self.addEventListener('sync', event => {
+    console.log('[SW] Background sync event:', event.tag);
     
-    for (const result of pendingResults) {
-      try {
-        // Try to sync with server when online
-        await syncResultWithServer(result);
-        await removePendingResult(result.id);
-      } catch (error) {
-        console.log('[SW] Failed to sync result:', error);
-        // Keep for next sync attempt
-      }
+    if (event.tag === 'sync-analysis') {
+        event.waitUntil(syncAnalysisResults());
     }
-  } catch (error) {
-    console.error('[SW] Background sync failed:', error);
-  }
-}
-
-// Push notifications for analysis completion
-self.addEventListener('push', (event) => {
-  const options = {
-    body: 'تم اكتمال تحليل العينة',
-    icon: '/assets/icons/icon-192x192.png',
-    badge: '/assets/icons/icon-128x128.png',
-    tag: 'analysis-complete',
-    requireInteraction: true,
-    actions: [
-      {
-        action: 'view-results',
-        title: 'عرض النتائج'
-      },
-      {
-        action: 'dismiss',
-        title: 'إغلاق'
-      }
-    ]
-  };
-  
-  event.waitUntil(
-    self.registration.showNotification('محلل الحيوانات المنوية', options)
-  );
 });
 
-// Handle notification clicks
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  
-  if (event.action === 'view-results') {
+// Sync analysis results when online
+async function syncAnalysisResults() {
+    try {
+        console.log('[SW] Syncing analysis results');
+        
+        // Get pending analysis results from IndexedDB
+        const pendingResults = await getPendingResults();
+        
+        for (const result of pendingResults) {
+            try {
+                // Send to server when implementation is available
+                console.log('[SW] Would sync result:', result.id);
+                // await fetch('/api/sync-result', { method: 'POST', body: JSON.stringify(result) });
+                
+                // Mark as synced
+                await markResultAsSynced(result.id);
+                
+            } catch (error) {
+                console.error('[SW] Failed to sync result:', result.id, error);
+            }
+        }
+        
+    } catch (error) {
+        console.error('[SW] Sync failed:', error);
+    }
+}
+
+// IndexedDB helpers (placeholder implementations)
+async function getPendingResults() {
+    // In a real implementation, this would query IndexedDB
+    return [];
+}
+
+async function markResultAsSynced(resultId) {
+    // In a real implementation, this would update IndexedDB
+    console.log('[SW] Marked as synced:', resultId);
+}
+
+// Push notification support
+self.addEventListener('push', event => {
+    console.log('[SW] Push received:', event);
+    
+    const options = {
+        body: event.data ? event.data.text() : 'إشعار من محلل الحيوانات المنوية',
+        icon: './assets/icon/icon.png',
+        badge: './assets/icon/icon.png',
+        vibrate: [200, 100, 200],
+        tag: 'sperm-analyzer-notification',
+        actions: [
+            {
+                action: 'open',
+                title: 'فتح التطبيق',
+                icon: './assets/icon/icon.png'
+            },
+            {
+                action: 'dismiss',
+                title: 'إغلاق',
+                icon: './assets/icon/icon.png'
+            }
+        ]
+    };
+    
     event.waitUntil(
-      clients.openWindow('/#results')
+        self.registration.showNotification('محلل الحيوانات المنوية', options)
     );
-  }
 });
 
-// IndexedDB helper functions for offline storage
-async function getPendingAnalysisResults() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('SpermAnalyzerDB', 1);
+// Notification click handler
+self.addEventListener('notificationclick', event => {
+    console.log('[SW] Notification click:', event);
     
-    request.onerror = () => reject(request.error);
+    event.notification.close();
     
-    request.onsuccess = () => {
-      const db = request.result;
-      const transaction = db.transaction(['pendingResults'], 'readonly');
-      const store = transaction.objectStore('pendingResults');
-      const getAllRequest = store.getAll();
-      
-      getAllRequest.onsuccess = () => resolve(getAllRequest.result);
-      getAllRequest.onerror = () => reject(getAllRequest.error);
-    };
-    
-    request.onupgradeneeded = (event) => {
-      const db = event.target.result;
-      if (!db.objectStoreNames.contains('pendingResults')) {
-        db.createObjectStore('pendingResults', { keyPath: 'id' });
-      }
-    };
-  });
-}
-
-async function syncResultWithServer(result) {
-  // Placeholder for server sync logic
-  // In a real implementation, this would send data to your backend
-  return fetch('/api/sync-analysis', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(result)
-  });
-}
-
-async function removePendingResult(id) {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('SpermAnalyzerDB', 1);
-    
-    request.onsuccess = () => {
-      const db = request.result;
-      const transaction = db.transaction(['pendingResults'], 'readwrite');
-      const store = transaction.objectStore('pendingResults');
-      const deleteRequest = store.delete(id);
-      
-      deleteRequest.onsuccess = () => resolve();
-      deleteRequest.onerror = () => reject(deleteRequest.error);
-    };
-  });
-}
-
-// Update cache when new version is available
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
+    if (event.action === 'open') {
+        event.waitUntil(
+            clients.openWindow('/')
+        );
+    }
 });
 
-console.log('[SW] Service Worker loaded successfully');
+// Message handler for communication with main thread
+self.addEventListener('message', event => {
+    console.log('[SW] Message received:', event.data);
+    
+    switch (event.data.type) {
+        case 'SKIP_WAITING':
+            self.skipWaiting();
+            break;
+            
+        case 'GET_VERSION':
+            event.ports[0].postMessage({ version: CACHE_NAME });
+            break;
+            
+        case 'CACHE_ANALYSIS':
+            cacheAnalysisResult(event.data.result);
+            break;
+    }
+});
+
+// Cache analysis result for offline access
+async function cacheAnalysisResult(result) {
+    try {
+        const cache = await caches.open(CACHE_NAME);
+        const response = new Response(JSON.stringify(result), {
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        await cache.put(`/analysis/${result.id}`, response);
+        console.log('[SW] Cached analysis result:', result.id);
+        
+    } catch (error) {
+        console.error('[SW] Failed to cache analysis result:', error);
+    }
+}
