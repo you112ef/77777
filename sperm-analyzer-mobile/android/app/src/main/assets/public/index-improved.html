@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <title>محلل الحيوانات المنوية بالذكاء الاصطناعي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="محلل الحيوانات المنوية" />
+    <meta name="description" content="تحليل ذكي للحيوانات المنوية باستخدام الذكاء الاصطناعي" />
+    <meta name="keywords" content="تحليل,حيوانات منوية,ذكاء اصطناعي,طبي" />
+    
+    <!-- Icons and Theme -->
+    <link rel="icon" type="image/svg+xml" href="assets/icon/logo.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/icon/icon-simple.svg" />
+    <meta name="theme-color" content="#00B4D8" />
+    <meta name="background-color" content="#FFFFFF" />
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style-improved.css" />
+    
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json" />
+</head>
+
+<body>
+    <div id="app" class="app-container">
+        <!-- Splash Screen -->
+        <div id="splash-screen" class="splash-screen">
+            <div class="splash-content">
+                <div class="splash-logo-container">
+                    <img src="assets/icon/logo.svg" alt="Logo" class="splash-logo">
+                    <div class="splash-logo-glow"></div>
+                </div>
+                <h1 class="splash-title">محلل الحيوانات المنوية</h1>
+                <p class="splash-subtitle">تحليل ذكي بالذكاء الاصطناعي</p>
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App -->
+        <div id="main-app" class="main-app hidden">
+            <!-- Status Bar Spacer for iOS -->
+            <div class="status-bar-spacer"></div>
+            
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-content">
+                    <div class="header-left">
+                        <button id="profile-btn" class="header-btn">
+                            <span class="material-icons-round">account_circle</span>
+                        </button>
+                    </div>
+                    
+                    <div class="header-center">
+                        <img src="assets/icon/icon-simple.svg" alt="Logo" class="header-logo">
+                        <h1 class="header-title">محلل الحيوانات المنوية</h1>
+                    </div>
+                    
+                    <div class="header-right">
+                        <button id="notifications-btn" class="header-btn">
+                            <span class="material-icons-round">notifications</span>
+                            <span class="notification-badge">2</span>
+                        </button>
+                        <button id="settings-btn" class="header-btn">
+                            <span class="material-icons-round">settings</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Container -->
+            <main class="page-container">
+                <!-- Home Page -->
+                <div id="home-page" class="page active">
+                    <!-- Welcome Card -->
+                    <div class="welcome-card">
+                        <div class="welcome-content">
+                            <div class="welcome-icon">
+                                <span class="material-icons-round">psychology</span>
+                            </div>
+                            <h2>مرحباً بك</h2>
+                            <p>تحليل دقيق وسريع باستخدام تقنيات الذكاء الاصطناعي المتقدمة</p>
+                        </div>
+                        <div class="welcome-illustration">
+                            <img src="assets/icon/logo.svg" alt="AI Illustration">
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="stats-section">
+                        <h3 class="section-title">إحصائيات سريعة</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card primary">
+                                <div class="stat-icon">
+                                    <span class="material-icons-round">analytics</span>
+                                </div>
+                                <div class="stat-content">
+                                    <h4>التحليلات</h4>
+                                    <p class="stat-number" id="total-analyses">0</p>
+                                    <span class="stat-label">إجمالي</span>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card success">
+                                <div class="stat-icon">
+                                    <span class="material-icons-round">check_circle</span>
+                                </div>
+                                <div class="stat-content">
+                                    <h4>نتائج طبيعية</h4>
+                                    <p class="stat-number" id="normal-results">0</p>
+                                    <span class="stat-label">نتيجة</span>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card info">
+                                <div class="stat-icon">
+                                    <span class="material-icons-round">schedule</span>
+                                </div>
+                                <div class="stat-content">
+                                    <h4>متوسط الوقت</h4>
+                                    <p class="stat-number" id="avg-time">--</p>
+                                    <span class="stat-label">ثانية</span>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card warning">
+                                <div class="stat-icon">
+                                    <span class="material-icons-round">star</span>
+                                </div>
+                                <div class="stat-content">
+                                    <h4>دقة النظام</h4>
+                                    <p class="stat-number">94.7%</p>
+                                    <span class="stat-label">دقة</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="actions-section">
+                        <h3 class="section-title">إجراءات سريعة</h3>
+                        <div class="quick-actions">
+                            <button class="action-card primary" onclick="navigateTo('analyze')">
+                                <div class="action-icon">
+                                    <span class="material-icons-round">camera_alt</span>
+                                </div>
+                                <div class="action-content">
+                                    <h4>تحليل عينة جديدة</h4>
+                                    <p>ابدأ تحليل عينة جديدة الآن</p>
+                                </div>
+                                <div class="action-arrow">
+                                    <span class="material-icons-round">arrow_forward</span>
+                                </div>
+                            </button>
+                            
+                            <button class="action-card secondary" onclick="navigateTo('history')">
+                                <div class="action-icon">
+                                    <span class="material-icons-round">history</span>
+                                </div>
+                                <div class="action-content">
+                                    <h4>عرض السجل</h4>
+                                    <p>استعرض التحليلات السابقة</p>
+                                </div>
+                                <div class="action-arrow">
+                                    <span class="material-icons-round">arrow_forward</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Medical Notice -->
+                    <div class="notice-card">
+                        <div class="notice-icon">
+                            <span class="material-icons-round">medical_information</span>
+                        </div>
+                        <div class="notice-content">
+                            <h4>تنبيه طبي مهم</h4>
+                            <p>هذا التطبيق للأغراض التعليمية والبحثية فقط. استشر طبيباً مختصاً للتشخيص الطبي.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analyze Page -->
+                <div id="analyze-page" class="page">
+                    <div class="page-header">
+                        <h2>تحليل عينة جديدة</h2>
+                        <p>التقط صورة أو اختر من المعرض</p>
+                    </div>
+
+                    <!-- Camera Section -->
+                    <div class="camera-card">
+                        <div class="image-preview" id="image-preview">
+                            <div class="preview-placeholder">
+                                <div class="placeholder-icon">
+                                    <span class="material-icons-round">add_photo_alternate</span>
+                                </div>
+                                <h3>إضافة صورة</h3>
+                                <p>التقط صورة أو اختر من المعرض</p>
+                            </div>
+                        </div>
+
+                        <div class="camera-controls">
+                            <button id="take-photo-btn" class="camera-btn primary">
+                                <span class="material-icons-round">camera_alt</span>
+                                <span>التقاط صورة</span>
+                            </button>
+                            <button id="select-photo-btn" class="camera-btn secondary">
+                                <span class="material-icons-round">photo_library</span>
+                                <span>اختيار من المعرض</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sample Info Form -->
+                    <div id="sample-form" class="form-card hidden">
+                        <h3>معلومات العينة</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="patient-id">معرف المريض</label>
+                                <input type="text" id="patient-id" placeholder="أدخل معرف المريض" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="sample-volume">حجم العينة (مل)</label>
+                                <input type="number" id="sample-volume" placeholder="3.5" step="0.1" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="sample-ph">درجة الحموضة pH</label>
+                                <input type="number" id="sample-ph" placeholder="7.2" step="0.1" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="sample-temp">درجة الحرارة (°م)</label>
+                                <input type="number" id="sample-temp" placeholder="37" step="0.1" />
+                            </div>
+                        </div>
+
+                        <button id="start-analysis-btn" class="analysis-btn">
+                            <span class="material-icons-round">play_arrow</span>
+                            <span>بدء التحليل</span>
+                        </button>
+                    </div>
+
+                    <!-- Analysis Progress -->
+                    <div id="analysis-progress" class="progress-card hidden">
+                        <div class="progress-header">
+                            <div class="progress-icon">
+                                <span class="material-icons-round">biotech</span>
+                            </div>
+                            <h3>جاري التحليل...</h3>
+                            <p id="progress-text">تحضير الصورة...</p>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div id="progress-fill" class="progress-fill"></div>
+                            </div>
+                            <div id="progress-percentage" class="progress-percentage">0%</div>
+                        </div>
+                        
+                        <div class="analysis-steps">
+                            <div class="step active" data-step="1">
+                                <span class="step-icon">1</span>
+                                <span class="step-text">تحضير الصورة</span>
+                            </div>
+                            <div class="step" data-step="2">
+                                <span class="step-icon">2</span>
+                                <span class="step-text">تحليل بالذكاء الاصطناعي</span>
+                            </div>
+                            <div class="step" data-step="3">
+                                <span class="step-icon">3</span>
+                                <span class="step-text">حساب النتائج</span>
+                            </div>
+                            <div class="step" data-step="4">
+                                <span class="step-icon">4</span>
+                                <span class="step-text">إنتاج التقرير</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analysis Results -->
+                    <div id="analysis-results" class="results-card hidden">
+                        <div class="results-header">
+                            <div class="confidence-badge">
+                                <span class="material-icons-round">verified</span>
+                                <span>درجة الثقة: <strong id="confidence-value">--</strong></span>
+                            </div>
+                            <h3>نتائج التحليل</h3>
+                        </div>
+
+                        <div class="results-grid">
+                            <div class="result-item concentration">
+                                <div class="result-header">
+                                    <span class="material-icons-round">scatter_plot</span>
+                                    <h4>التركيز</h4>
+                                </div>
+                                <div class="result-value">
+                                    <span id="concentration-value" class="value">--</span>
+                                    <span class="unit">مليون/مل</span>
+                                </div>
+                                <div id="concentration-status" class="result-status">--</div>
+                            </div>
+
+                            <div class="result-item motility">
+                                <div class="result-header">
+                                    <span class="material-icons-round">trending_up</span>
+                                    <h4>الحركة</h4>
+                                </div>
+                                <div class="result-value">
+                                    <span id="motility-value" class="value">--</span>
+                                    <span class="unit">%</span>
+                                </div>
+                                <div id="motility-status" class="result-status">--</div>
+                            </div>
+
+                            <div class="result-item morphology">
+                                <div class="result-header">
+                                    <span class="material-icons-round">shape_line</span>
+                                    <h4>الشكل الطبيعي</h4>
+                                </div>
+                                <div class="result-value">
+                                    <span id="morphology-value" class="value">--</span>
+                                    <span class="unit">%</span>
+                                </div>
+                                <div id="morphology-status" class="result-status">--</div>
+                            </div>
+
+                            <div class="result-item viability">
+                                <div class="result-header">
+                                    <span class="material-icons-round">favorite</span>
+                                    <h4>الحيوية</h4>
+                                </div>
+                                <div class="result-value">
+                                    <span id="viability-value" class="value">--</span>
+                                    <span class="unit">%</span>
+                                </div>
+                                <div id="viability-status" class="result-status">--</div>
+                            </div>
+                        </div>
+
+                        <div class="result-actions">
+                            <button id="save-result-btn" class="result-btn primary">
+                                <span class="material-icons-round">save</span>
+                                <span>حفظ النتيجة</span>
+                            </button>
+                            <button id="share-result-btn" class="result-btn secondary">
+                                <span class="material-icons-round">share</span>
+                                <span>مشاركة</span>
+                            </button>
+                            <button id="generate-report-btn" class="result-btn secondary">
+                                <span class="material-icons-round">description</span>
+                                <span>تقرير مفصل</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Page -->
+                <div id="history-page" class="page">
+                    <div class="page-header">
+                        <h2>سجل التحليلات</h2>
+                        <p>جميع التحليلات السابقة</p>
+                    </div>
+
+                    <!-- History Filters -->
+                    <div class="filter-bar">
+                        <div class="filter-group">
+                            <select id="time-filter" class="filter-select">
+                                <option value="all">جميع الفترات</option>
+                                <option value="today">اليوم</option>
+                                <option value="week">هذا الأسبوع</option>
+                                <option value="month">هذا الشهر</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <select id="status-filter" class="filter-select">
+                                <option value="all">جميع النتائج</option>
+                                <option value="normal">طبيعي</option>
+                                <option value="abnormal">غير طبيعي</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- History List -->
+                    <div id="history-list" class="history-container">
+                        <!-- History items will be populated here -->
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="empty-history" class="empty-state">
+                        <div class="empty-icon">
+                            <span class="material-icons-round">history</span>
+                        </div>
+                        <h3>لا توجد تحليلات</h3>
+                        <p>ابدأ بتحليل عينة جديدة لرؤية النتائج هنا</p>
+                        <button class="empty-action-btn" onclick="navigateTo('analyze')">
+                            <span class="material-icons-round">camera_alt</span>
+                            <span>تحليل عينة جديدة</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Reports Page -->
+                <div id="reports-page" class="page">
+                    <div class="page-header">
+                        <h2>التقارير والإحصائيات</h2>
+                        <p>تقارير مفصلة عن التحليلات</p>
+                    </div>
+
+                    <!-- Report Controls -->
+                    <div class="report-controls">
+                        <div class="control-group">
+                            <label for="report-period">الفترة الزمنية</label>
+                            <select id="report-period" class="control-select">
+                                <option value="week">آخر أسبوع</option>
+                                <option value="month">آخر شهر</option>
+                                <option value="quarter">آخر ربع</option>
+                                <option value="year">آخر سنة</option>
+                            </select>
+                        </div>
+                        <button id="export-report-btn" class="export-btn">
+                            <span class="material-icons-round">download</span>
+                            <span>تصدير التقرير</span>
+                        </button>
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div class="charts-section">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>توزيع النتائج</h3>
+                                <button class="chart-options-btn">
+                                    <span class="material-icons-round">more_vert</span>
+                                </button>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="results-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>الاتجاه الزمني</h3>
+                                <button class="chart-options-btn">
+                                    <span class="material-icons-round">more_vert</span>
+                                </button>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="trend-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Page -->
+                <div id="settings-page" class="page">
+                    <div class="page-header">
+                        <h2>الإعدادات</h2>
+                        <p>تخصيص التطبيق حسب احتياجاتك</p>
+                    </div>
+
+                    <div class="settings-sections">
+                        <!-- Account Section -->
+                        <div class="settings-section">
+                            <h3 class="section-title">الحساب</h3>
+                            <div class="settings-items">
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="material-icons-round">person</span>
+                                        <div>
+                                            <h4>الملف الشخصي</h4>
+                                            <p>إدارة معلومات الحساب</p>
+                                        </div>
+                                    </div>
+                                    <span class="material-icons-round">arrow_forward</span>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="material-icons-round">security</span>
+                                        <div>
+                                            <h4>الخصوصية والأمان</h4>
+                                            <p>إدارة إعدادات الخصوصية</p>
+                                        </div>
+                                    </div>
+                                    <span class="material-icons-round">arrow_forward</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- App Settings -->
+                        <div class="settings-section">
+                            <h3 class="section-title">إعدادات التطبيق</h3>
+                            <div class="settings-items">
+                                <div class="setting-item toggle">
+                                    <div class="setting-info">
+                                        <span class="material-icons-round">dark_mode</span>
+                                        <div>
+                                            <h4>الوضع الليلي</h4>
+                                            <p>تفعيل المظهر الداكن</p>
+                                        </div>
+                                    </div>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="dark-mode-toggle">
+                                        <label for="dark-mode-toggle"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="setting-item toggle">
+                                    <div class="setting-info">
+                                        <span class="material-icons-round">notifications</span>
+                                        <div>
+                                            <h4>الإشعارات</h4>
+                                            <p>تفعيل إشعارات التطبيق</p>
+                                        </div>
+                                    </div>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="notifications-toggle" checked>
+                                        <label for="notifications-toggle"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- About Section -->
+                        <div class="settings-section">
+                            <h3 class="section-title">حول التطبيق</h3>
+                            <div class="settings-items">
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="material-icons-round">info</span>
+                                        <div>
+                                            <h4>معلومات التطبيق</h4>
+                                            <p>الإصدار 1.0.0</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="material-icons-round">help</span>
+                                        <div>
+                                            <h4>المساعدة والدعم</h4>
+                                            <p>الحصول على المساعدة</p>
+                                        </div>
+                                    </div>
+                                    <span class="material-icons-round">arrow_forward</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Bottom Navigation -->
+            <nav class="bottom-nav">
+                <div class="nav-container">
+                    <button class="nav-item active" data-page="home">
+                        <div class="nav-icon">
+                            <span class="material-icons-round">home</span>
+                        </div>
+                        <span class="nav-label">الرئيسية</span>
+                        <div class="nav-indicator"></div>
+                    </button>
+                    
+                    <button class="nav-item" data-page="analyze">
+                        <div class="nav-icon">
+                            <span class="material-icons-round">camera_alt</span>
+                        </div>
+                        <span class="nav-label">تحليل</span>
+                        <div class="nav-indicator"></div>
+                    </button>
+                    
+                    <button class="nav-item center" data-page="analyze">
+                        <div class="nav-fab">
+                            <span class="material-icons-round">add</span>
+                        </div>
+                    </button>
+                    
+                    <button class="nav-item" data-page="history">
+                        <div class="nav-icon">
+                            <span class="material-icons-round">history</span>
+                        </div>
+                        <span class="nav-label">السجل</span>
+                        <div class="nav-indicator"></div>
+                    </button>
+                    
+                    <button class="nav-item" data-page="reports">
+                        <div class="nav-icon">
+                            <span class="material-icons-round">analytics</span>
+                        </div>
+                        <span class="nav-label">التقارير</span>
+                        <div class="nav-indicator"></div>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Safe Area Bottom Spacer -->
+            <div class="safe-area-spacer"></div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button for Quick Analysis -->
+    <button id="fab-analyze" class="fab hidden">
+        <span class="material-icons-round">camera_alt</span>
+    </button>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-content">
+            <div class="loading-spinner-lg"></div>
+            <p>جاري المعالجة...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/capacitor.js"></script>
+    <script src="js/tf.min.js"></script>
+    <script src="js/cv.js"></script>
+    <script src="js/app-improved.js"></script>
+    <script src="js/camera-improved.js"></script>
+    <script src="js/analyzer-improved.js"></script>
+    <script src="js/storage-improved.js"></script>
+    <script src="js/ui-improved.js"></script>
+</body>
+</html>
