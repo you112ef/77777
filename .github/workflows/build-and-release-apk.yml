@@ -1,0 +1,208 @@
+name: 🚀 Build and Release Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release Type'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+        - debug
+        - release
+
+jobs:
+  build-android:
+    name: 📱 Build Android APK
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        api-level: [29]
+        target: [default]
+        arch: [x86_64]
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: 🏗️ Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'sperm-analyzer-mobile/package-lock.json'
+    
+    - name: ☕ Setup Java JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: 🛠️ Setup Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        api-level: 29
+        build-tools: '33.0.0'
+        cmake: '3.22.1'
+        ndk: '25.1.8937393'
+    
+    - name: 📦 Install Dependencies
+      working-directory: ./sperm-analyzer-mobile
+      run: |
+        npm ci
+        npm install -g @capacitor/cli
+    
+    - name: 🔨 Build Web Assets
+      working-directory: ./sperm-analyzer-mobile
+      run: |
+        npm run build
+        npx cap sync android
+    
+    - name: 🔐 Create Keystore (Debug)
+      working-directory: ./sperm-analyzer-mobile/android
+      run: |
+        keytool -genkey -v -keystore debug.keystore -alias debug -keyalg RSA -keysize 2048 -validity 10000 \
+        -dname "CN=SpermAnalyzer, OU=Medical, O=AI Lab, L=Riyadh, ST=Saudi Arabia, C=SA" \
+        -storepass android -keypass android
+    
+    - name: 📱 Build Debug APK
+      working-directory: ./sperm-analyzer-mobile/android
+      run: |
+        chmod +x gradlew
+        ./gradlew assembleDebug
+    
+    - name: 📱 Build Release APK (if tag)
+      if: startsWith(github.ref, 'refs/tags/v')
+      working-directory: ./sperm-analyzer-mobile/android
+      run: |
+        ./gradlew assembleRelease
+    
+    - name: 📊 APK Info
+      working-directory: ./sperm-analyzer-mobile/android
+      run: |
+        echo "📱 APK Build Information:"
+        echo "========================"
+        ls -la app/build/outputs/apk/debug/ || echo "No debug APK found"
+        ls -la app/build/outputs/apk/release/ || echo "No release APK found"
+        
+        if [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
+          echo "📏 Debug APK Size: $(du -h app/build/outputs/apk/debug/app-debug.apk | cut -f1)"
+        fi
+        
+        if [ -f "app/build/outputs/apk/release/app-release-unsigned.apk" ]; then
+          echo "📏 Release APK Size: $(du -h app/build/outputs/apk/release/app-release-unsigned.apk | cut -f1)"
+        fi
+    
+    - name: ✅ Verify APK
+      working-directory: ./sperm-analyzer-mobile/android
+      run: |
+        if [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
+          aapt dump badging app/build/outputs/apk/debug/app-debug.apk | grep -E "(application-label|package:|versionCode|versionName|platformBuildVersionName)"
+        fi
+    
+    - name: 📤 Upload Debug APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: 🧬 Sperm-Analyzer-AI-Debug-APK
+        path: sperm-analyzer-mobile/android/app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 30
+    
+    - name: 📤 Upload Release APK (if exists)
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: actions/upload-artifact@v4
+      with:
+        name: 🧬 Sperm-Analyzer-AI-Release-APK
+        path: sperm-analyzer-mobile/android/app/build/outputs/apk/release/app-release-unsigned.apk
+        retention-days: 90
+    
+    - name: 🎉 Create GitHub Release
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: softprops/action-gh-release@v1
+      with:
+        name: 🧬 Sperm Analyzer AI v${{ github.ref_name }}
+        body: |
+          # 🧬 محلل الحيوانات المنوية بالذكاء الاصطناعي
+          
+          ## ✨ الميزات الجديدة:
+          - 🎯 تحليل دقيق باستخدام YOLOv8 وDeepSORT
+          - 📊 رسوم بيانية تفاعلية باللغة العربية
+          - 🏥 توافق مع معايير منظمة الصحة العالمية (WHO 2010)
+          - 📱 يعمل 100% بدون إنترنت
+          - 📤 تصدير النتائج بصيغ متعددة (PDF, CSV, JSON)
+          - 📷 التقاط من الكاميرا أو اختيار من المعرض
+          
+          ## 📱 كيفية التثبيت:
+          1. حمّل ملف APK من الأسفل
+          2. فعّل "مصادر غير معروفة" في إعدادات الأمان
+          3. ثبّت التطبيق واستمتع!
+          
+          ## ⚠️ تنبيه طبي:
+          هذا التطبيق للأغراض التعليمية والبحثية فقط. يُنصح بمراجعة طبيب مختص للتشخيص الطبي.
+          
+          ---
+          
+          # 🧬 Sperm Analyzer AI (English)
+          
+          ## ✨ New Features:
+          - 🎯 Accurate analysis using YOLOv8 and DeepSORT
+          - 📊 Interactive charts in Arabic
+          - 🏥 WHO 2010 compliant analysis
+          - 📱 100% offline functionality
+          - 📤 Multi-format export (PDF, CSV, JSON)
+          - 📷 Camera capture or gallery selection
+          
+          Built with ❤️ using AI and modern web technologies.
+        files: |
+          sperm-analyzer-mobile/android/app/build/outputs/apk/debug/app-debug.apk
+          sperm-analyzer-mobile/android/app/build/outputs/apk/release/app-release-unsigned.apk
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  security-scan:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    needs: build-android
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+    
+    - name: 🔍 Run CodeQL Analysis
+      uses: github/codeql-action/init@v3
+      with:
+        languages: javascript
+    
+    - name: 🔍 Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+
+  notify:
+    name: 📢 Notify Build Status
+    runs-on: ubuntu-latest
+    needs: [build-android, security-scan]
+    if: always()
+    
+    steps:
+    - name: 🎉 Success Notification
+      if: needs.build-android.result == 'success'
+      run: |
+        echo "✅ APK تم بناؤه بنجاح!"
+        echo "🔗 يمكنك تحميل APK من artifacts أو releases"
+        echo "📱 التطبيق جاهز للاستخدام!"
+    
+    - name: ❌ Failure Notification
+      if: needs.build-android.result == 'failure'
+      run: |
+        echo "❌ فشل في بناء APK"
+        echo "🔍 تحقق من logs للتفاصيل"
