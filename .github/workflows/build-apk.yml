@@ -38,6 +38,20 @@ jobs:
         npm install
         npm install -g @capacitor/cli
         
+    - name: Install Python and dependencies
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install Python packages
+      run: |
+        pip install tensorflow opencv-python ultralytics numpy
+        
+    - name: Create local AI model
+      run: |
+        cd sperm-analyzer-ai
+        python create_local_model.py
+        
     - name: Build web assets
       working-directory: sperm-analyzer-mobile
       run: |

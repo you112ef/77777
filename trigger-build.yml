@@ -1,0 +1,11 @@
+# 🚀 Trigger for APK Build
+name: trigger-apk-build
+created: 2025-07-06 19:04:00
+version: 1.0.0
+status: ready-to-build
+
+# لتشغيل البناء على GitHub:
+# 1. ارفع هذا الملف إلى repository
+# 2. اذهب إلى Actions → Build Android APK 
+# 3. اضغط "Run workflow"
+# 4. حمل APK من Artifacts أو Releases

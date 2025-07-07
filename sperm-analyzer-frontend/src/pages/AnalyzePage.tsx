@@ -126,7 +126,7 @@ export default function AnalyzePage({ onNavigate }: AnalyzePageProps) {
     
     try {
       // Import API client
-      const { devApiClient } = await import('../backend/api');
+      const { devApiClient } = await import('@/backend/api');
       
       // Start analysis
       const analysisType = file.type.startsWith('video/') ? 'video' : 'image';

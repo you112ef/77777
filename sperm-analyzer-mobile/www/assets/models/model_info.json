@@ -1,0 +1,43 @@
+{
+  "models": {
+    "primary": {
+      "path": "assets/models/sperm_detector.tflite",
+      "metadata": "assets/models/model_metadata.json",
+      "type": "tensorflow_lite",
+      "version": "1.0",
+      "description": "Local sperm detection model for offline analysis",
+      "status": "ready"
+    }
+  },
+  "created_at": "2024-01-01T00:00:00Z",
+  "description": "Local sperm detection model for offline analysis",
+  "performance": {
+    "average_inference_time_ms": 200,
+    "accuracy": 0.85,
+    "supported_platforms": ["android", "ios", "web"]
+  },
+  "capabilities": {
+    "image_analysis": true,
+    "video_analysis": false,
+    "batch_processing": false,
+    "real_time_processing": true
+  },
+  "requirements": {
+    "min_image_size": [224, 224],
+    "max_image_size": [1920, 1920],
+    "supported_formats": ["jpg", "jpeg", "png", "webp"],
+    "memory_requirements_mb": 100
+  },
+  "version_history": [
+    {
+      "version": "1.0",
+      "date": "2024-01-01",
+      "changes": [
+        "Initial release",
+        "Basic sperm detection",
+        "CASA metrics calculation",
+        "TensorFlow Lite optimization"
+      ]
+    }
+  ]
+}

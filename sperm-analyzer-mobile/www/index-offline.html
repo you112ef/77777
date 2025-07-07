@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <title>محلل الحيوانات المنوية - AI محلي</title>
+    <base href="/" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest-improved.json">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" href="assets/icons/icon-128x128.png" />
+    <link rel="apple-touch-icon" href="assets/icons/icon-192x192.png" />
+    
+    <!-- TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl@4.15.0/dist/tf-backend-webgl.min.js"></script>
+    
+    <!-- Capacitor -->
+    <script type="module" src="https://unpkg.com/@capacitor/core@6.0.0/dist/capacitor.js"></script>
+    <script type="module" src="https://unpkg.com/@capacitor/camera@6.0.0/dist/plugin.js"></script>
+    <script type="module" src="https://unpkg.com/@capacitor/filesystem@6.0.0/dist/plugin.js"></script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/unified-styles.css">
+    <link rel="stylesheet" href="css/offline-styles.css">
+    
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <img src="logo.svg" alt="محلل الحيوانات المنوية" class="logo-image">
+            </div>
+            <div class="loading-spinner"></div>
+            <div class="loading-text">جاري تحميل نموذج الذكاء الاصطناعي...</div>
+            <div class="loading-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="loading-progress"></div>
+                </div>
+                <div class="progress-text" id="loading-status">تهيئة TensorFlow.js...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="app-container" style="display: none;">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <button class="menu-btn" onclick="toggleSidebar()">
+                        <i class="material-icons">menu</i>
+                    </button>
+                    <div class="app-title">
+                        <h1>محلل الحيوانات المنوية</h1>
+                        <span class="subtitle">AI محلي - يعمل بدون إنترنت</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="ai-status" id="ai-status">
+                        <i class="material-icons status-icon">psychology</i>
+                        <span class="status-text">جاري التحميل...</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-content">
+                <div class="sidebar-header">
+                    <img src="logo.svg" alt="Logo" class="sidebar-logo">
+                    <h3>القائمة الرئيسية</h3>
+                </div>
+                <ul class="sidebar-menu">
+                    <li><a href="#home" onclick="showSection('home')"><i class="material-icons">home</i>الرئيسية</a></li>
+                    <li><a href="#camera" onclick="showSection('camera')"><i class="material-icons">camera_alt</i>التصوير</a></li>
+                    <li><a href="#analysis" onclick="showSection('analysis')"><i class="material-icons">analytics</i>التحليل</a></li>
+                    <li><a href="#results" onclick="showSection('results')"><i class="material-icons">assessment</i>النتائج</a></li>
+                    <li><a href="#history" onclick="showSection('history')"><i class="material-icons">history</i>السجل</a></li>
+                    <li><a href="#settings" onclick="showSection('settings')"><i class="material-icons">settings</i>الإعدادات</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Home Section -->
+            <section id="home" class="content-section active">
+                <div class="welcome-card">
+                    <div class="welcome-header">
+                        <i class="material-icons welcome-icon">psychology</i>
+                        <h2>مرحباً بك في محلل الحيوانات المنوية</h2>
+                        <p>تطبيق متطور يستخدم الذكاء الاصطناعي المحلي لتحليل عينات الحيوانات المنوية</p>
+                    </div>
+                    
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <i class="material-icons">offline_bolt</i>
+                            <h3>يعمل بدون إنترنت</h3>
+                            <p>جميع العمليات تتم محلياً على جهازك</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="material-icons">speed</i>
+                            <h3>تحليل سريع</h3>
+                            <p>نتائج فورية خلال ثوانٍ معدودة</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="material-icons">security</i>
+                            <h3>خصوصية كاملة</h3>
+                            <p>لا يتم إرسال أي بيانات خارج الجهاز</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="material-icons">precision_manufacturing</i>
+                            <h3>دقة عالية</h3>
+                            <p>تقنية متقدمة لنتائج موثوقة</p>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="primary-btn" onclick="showSection('camera')">
+                            <i class="material-icons">camera_alt</i>
+                            بدء التحليل
+                        </button>
+                        <button class="secondary-btn" onclick="showSection('history')">
+                            <i class="material-icons">history</i>
+                            عرض السجل
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Camera Section -->
+            <section id="camera" class="content-section">
+                <div class="camera-container">
+                    <div class="camera-header">
+                        <h2>التقاط الصورة أو الفيديو</h2>
+                        <p>اختر نوع العينة للحصول على أفضل النتائج</p>
+                    </div>
+                    
+                    <div class="capture-options">
+                        <div class="option-card" onclick="captureImage()">
+                            <i class="material-icons option-icon">camera_alt</i>
+                            <h3>صورة ثابتة</h3>
+                            <p>للعينات الثابتة والتحليل السريع</p>
+                            <button class="option-btn">التقاط صورة</button>
+                        </div>
+                        
+                        <div class="option-card" onclick="captureVideo()">
+                            <i class="material-icons option-icon">videocam</i>
+                            <h3>فيديو متحرك</h3>
+                            <p>لتحليل الحركة والنشاط</p>
+                            <button class="option-btn">تسجيل فيديو</button>
+                        </div>
+                        
+                        <div class="option-card" onclick="selectFromGallery()">
+                            <i class="material-icons option-icon">photo_library</i>
+                            <h3>من المعرض</h3>
+                            <p>اختيار صورة أو فيديو محفوظ</p>
+                            <button class="option-btn">اختيار ملف</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Preview Area -->
+                    <div id="preview-area" class="preview-area" style="display: none;">
+                        <div class="preview-header">
+                            <h3>معاينة العينة</h3>
+                            <button class="close-btn" onclick="closePreview()">
+                                <i class="material-icons">close</i>
+                            </button>
+                        </div>
+                        <div class="preview-content">
+                            <div class="media-container">
+                                <img id="preview-image" style="display: none;" alt="Preview">
+                                <video id="preview-video" style="display: none;" controls></video>
+                            </div>
+                            <div class="preview-actions">
+                                <button class="primary-btn" onclick="analyzeMedia()">
+                                    <i class="material-icons">analytics</i>
+                                    تحليل العينة
+                                </button>
+                                <button class="secondary-btn" onclick="retakeMedia()">
+                                    <i class="material-icons">refresh</i>
+                                    إعادة التقاط
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analysis Section -->
+            <section id="analysis" class="content-section">
+                <div class="analysis-container">
+                    <div id="analysis-waiting" class="analysis-waiting">
+                        <div class="waiting-content">
+                            <i class="material-icons waiting-icon">hourglass_empty</i>
+                            <h2>جاري التحليل...</h2>
+                            <p>يرجى التقاط صورة أو فيديو أولاً</p>
+                            <button class="primary-btn" onclick="showSection('camera')">
+                                <i class="material-icons">camera_alt</i>
+                                التقاط عينة
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="analysis-processing" class="analysis-processing" style="display: none;">
+                        <div class="processing-header">
+                            <h2>جاري معالجة العينة</h2>
+                            <p>الذكاء الاصطناعي يحلل العينة...</p>
+                        </div>
+                        
+                        <div class="processing-steps">
+                            <div class="step active" id="step-preprocessing">
+                                <i class="material-icons">image</i>
+                                <span>معالجة الصورة</span>
+                            </div>
+                            <div class="step" id="step-detection">
+                                <i class="material-icons">search</i>
+                                <span>اكتشاف الخلايا</span>
+                            </div>
+                            <div class="step" id="step-analysis">
+                                <i class="material-icons">analytics</i>
+                                <span>تحليل النتائج</span>
+                            </div>
+                            <div class="step" id="step-report">
+                                <i class="material-icons">assessment</i>
+                                <span>إنشاء التقرير</span>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="analysis-progress"></div>
+                            </div>
+                            <div class="progress-text" id="analysis-status">بدء التحليل...</div>
+                        </div>
+                        
+                        <div class="processing-info">
+                            <div class="info-item">
+                                <span class="info-label">وقت المعالجة:</span>
+                                <span class="info-value" id="processing-time">0s</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">نوع العينة:</span>
+                                <span class="info-value" id="sample-type">غير محدد</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="results" class="content-section">
+                <div id="results-container" class="results-container">
+                    <!-- Results will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- History Section -->
+            <section id="history" class="content-section">
+                <div class="history-container">
+                    <div class="history-header">
+                        <h2>سجل التحليلات</h2>
+                        <div class="history-controls">
+                            <button class="secondary-btn" onclick="clearHistory()">
+                                <i class="material-icons">delete</i>
+                                مسح السجل
+                            </button>
+                            <button class="secondary-btn" onclick="exportHistory()">
+                                <i class="material-icons">download</i>
+                                تصدير
+                            </button>
+                        </div>
+                    </div>
+                    <div id="history-list" class="history-list">
+                        <!-- History items will be populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="content-section">
+                <div class="settings-container">
+                    <div class="settings-header">
+                        <h2>الإعدادات</h2>
+                        <p>تخصيص التطبيق حسب احتياجاتك</p>
+                    </div>
+                    
+                    <div class="settings-groups">
+                        <div class="setting-group">
+                            <h3>إعدادات التحليل</h3>
+                            <div class="setting-item">
+                                <label>حد الثقة للاكتشاف</label>
+                                <input type="range" id="confidence-threshold" min="0.1" max="0.9" step="0.1" value="0.5">
+                                <span id="confidence-value">0.5</span>
+                            </div>
+                            <div class="setting-item">
+                                <label>دقة التحليل</label>
+                                <select id="analysis-quality">
+                                    <option value="fast">سريع</option>
+                                    <option value="balanced" selected>متوازن</option>
+                                    <option value="accurate">دقيق</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-group">
+                            <h3>إعدادات التطبيق</h3>
+                            <div class="setting-item">
+                                <label>الوضع المظلم</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="dark-mode">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <label>حفظ النتائج تلقائياً</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="auto-save" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-group">
+                            <h3>معلومات النموذج</h3>
+                            <div id="model-info" class="model-info">
+                                <!-- Model info will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="nav-item" onclick="showSection('home')" data-section="home">
+                <i class="material-icons">home</i>
+                <span>الرئيسية</span>
+            </div>
+            <div class="nav-item" onclick="showSection('camera')" data-section="camera">
+                <i class="material-icons">camera_alt</i>
+                <span>التصوير</span>
+            </div>
+            <div class="nav-item fab-container" onclick="showSection('analysis')" data-section="analysis">
+                <div class="fab">
+                    <i class="material-icons">analytics</i>
+                </div>
+                <span>التحليل</span>
+            </div>
+            <div class="nav-item" onclick="showSection('results')" data-section="results">
+                <i class="material-icons">assessment</i>
+                <span>النتائج</span>
+            </div>
+            <div class="nav-item" onclick="showSection('settings')" data-section="settings">
+                <i class="material-icons">settings</i>
+                <span>الإعدادات</span>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/local-ai-processor.js"></script>
+    <script src="js/app-offline.js"></script>
+
+    <!-- Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => console.log('SW registered'))
+                    .catch(error => console.log('SW registration failed'));
+            });
+        }
+    </script>
+</body>
+</html>
