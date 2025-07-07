@@ -1,0 +1,138 @@
+{
+  "name": "محلل الحيوانات المنوية بالذكاء الاصطناعي",
+  "short_name": "محلل الحيوانات المنوية",
+  "description": "تطبيق ذكي لتحليل الحيوانات المنوية باستخدام تقنيات الذكاء الاصطناعي المتقدمة",
+  "version": "1.0.0",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#00B4D8",
+  "background_color": "#FFFFFF",
+  "dir": "rtl",
+  "lang": "ar",
+  "scope": "/",
+  "prefer_related_applications": false,
+  "categories": ["medical", "health", "productivity", "education"],
+  "shortcuts": [
+    {
+      "name": "تحليل عينة جديدة",
+      "short_name": "تحليل جديد",
+      "description": "ابدأ تحليل عينة جديدة باستخدام الذكاء الاصطناعي",
+      "url": "/?page=analyze",
+      "icons": [
+        {
+          "src": "assets/icon/icon-simple.svg",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "عرض السجل",
+      "short_name": "السجل",
+      "description": "استعرض التحليلات السابقة والنتائج المحفوظة",
+      "url": "/?page=history",
+      "icons": [
+        {
+          "src": "assets/icon/icon-simple.svg",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "التقارير والإحصائيات",
+      "short_name": "التقارير",
+      "description": "عرض التقارير المفصلة والإحصائيات",
+      "url": "/?page=reports",
+      "icons": [
+        {
+          "src": "assets/icon/icon-simple.svg",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "icons": [
+    {
+      "src": "assets/icon/icon-simple.svg",
+      "sizes": "48x48",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon/icon-simple.svg",
+      "sizes": "72x72",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon/icon-simple.svg",
+      "sizes": "96x96",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon/icon-simple.svg",
+      "sizes": "144x144",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon/icon-simple.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon/logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon/icon-simple.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/icon/logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/screenshots/home.png",
+      "type": "image/png",
+      "sizes": "390x844",
+      "form_factor": "narrow",
+      "label": "الصفحة الرئيسية للتطبيق"
+    },
+    {
+      "src": "assets/screenshots/analyze.png", 
+      "type": "image/png",
+      "sizes": "390x844",
+      "form_factor": "narrow",
+      "label": "صفحة تحليل العينات"
+    },
+    {
+      "src": "assets/screenshots/results.png",
+      "type": "image/png", 
+      "sizes": "390x844",
+      "form_factor": "narrow",
+      "label": "نتائج التحليل المفصلة"
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+spermanalyzer",
+      "url": "/?protocol=%s"
+    }
+  ],
+  "related_applications": [],
+  "iarc_rating_id": "e58c174a-81d2-5c3c-32cc-34b8de4a52e9"
+}
