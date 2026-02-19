@@ -64,7 +64,7 @@
   },
   "homepage": "https://spermanalyzer.ai",
   "devDependencies": {
-    "@capacitor/cli": "^6.2.1",
+    "@capacitor/cli": "^8.1.0",
     "@types/long": "^4.0.2",
     "@types/node": "^20.0.0",
     "@types/offscreencanvas": "^2019.7.3",
